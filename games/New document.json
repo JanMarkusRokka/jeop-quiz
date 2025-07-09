@@ -1,0 +1,18 @@
+{
+  "title": "testname",
+  "categories": [
+    "Does1?",
+    "Does2?",
+    "Does3?",
+    "Does4",
+    "Does5?"
+  ],
+  "color": "gold",
+  "null": null,
+  "number": 123,
+  "object": {
+    "a": "b",
+    "c": "d"
+  },
+  "string": "Hello World"
+}
