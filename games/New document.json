@@ -1,11 +1,11 @@
 {
   "title": "testname",
   "categories": {
-    "Does1?": ["Kas?", "Kes?", "Kus?", "Millal", "Milleks?"],
-    "Does2?": ["Kas?", "Kes?", "Kus?", "Millal", "Milleks?"],
-    "Does3?": ["Kas?", "Kes?", "Kus?", "Millal", "Milleks?"],
-    "Does4?": ["Kas?", "Kes?", "Kus?", "Millal", "Milleks?"],
-    "Does5?": ["Kas?", "Kes?", "Kus?", "Millal", "Milleks?"]
+    "1": ["CategoryTitle1", "Kas ja kuidas ja kas ja kuidas ja kas?", "Kes?", "Kus?", "Millal", "Milleks?"],
+    "2": ["CategoryTitle2", "Kas?", "Kes?", "Kus?", "Millal", "Milleks?"],
+    "3": ["CategoryTitle3", "Kas?", "Kes?", "Kus?", "Millal", "Milleks?"],
+    "4": ["CategoryTitle4", "Kas?", "Kes?", "Kus?", "Millal", "Milleks?"],
+    "5": ["CategoryTitle5", "Kas?", "Kes?", "Kus?", "Millal", "Milleks?"]
   },
   "null": null,
   "number": 123,
