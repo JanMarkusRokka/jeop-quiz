@@ -1,13 +1,12 @@
 {
   "title": "testname",
-  "categories": [
-    "Does1?",
-    "Does2?",
-    "Does3?",
-    "Does4",
-    "Does5?"
-  ],
-  "color": "gold",
+  "categories": {
+    "Does1?": ["Kas?", "Kes?", "Kus?", "Millal", "Milleks?"],
+    "Does2?": ["Kas?", "Kes?", "Kus?", "Millal", "Milleks?"],
+    "Does3?": ["Kas?", "Kes?", "Kus?", "Millal", "Milleks?"],
+    "Does4?": ["Kas?", "Kes?", "Kus?", "Millal", "Milleks?"],
+    "Does5?": ["Kas?", "Kes?", "Kus?", "Millal", "Milleks?"]
+  },
   "null": null,
   "number": 123,
   "object": {
