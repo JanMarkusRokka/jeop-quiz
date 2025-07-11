@@ -78,6 +78,7 @@ class GameBoard(QWidget):
         self.input_field.setFixedWidth(300)
         self.input_field.setAlignment(Qt.AlignCenter)
         self.input_field.hide()
+        self.edit_mode = False
 
         self.input_field.returnPressed.connect(self.save_edit)
 
@@ -119,21 +120,26 @@ class GameBoard(QWidget):
             cat_button.setFont(QFont("Arial", 11))
             cat_button.setFixedWidth(120)
             cat_button.setStyleSheet('text-align: center; white-space: normal;')
-            cat_button.clicked.connect(lambda _, b=cat_button: self.edit_field(b))
+            if (self.edit_mode):
+                cat_button.clicked.connect(lambda _, b=cat_button: self.edit_field(b))
+            #else:
+            #    cat_button.clicked.connect(lambda _, b=cat_button: self.play_field()) WORKING ON THIS RN brudda
             self.grid.addWidget(cat_button, 0, col)
 
-            self.category_buttons[cat_button] = cat_id
+            self.category_buttons[cat_button] = (cat_id, 0)
 
             questions = self.current_data["categories"][cat_id][1:]
             for row, question in enumerate(questions, start=1):
-                q_button = QPushButton(question)
+                q_button = QPushButton(str(question[0]))
                 q_button.setFont(QFont("Arial", 10))
+                if (self.edit_mode):
+                    q_button.clicked.connect(lambda _, b=q_button: self.edit_field(b))
                 self.grid.addWidget(q_button, row, col)
-        print(self.category_buttons)
+                self.category_buttons[q_button] = (cat_id, row)
 
     def edit_field(self, button):
         index = self.category_buttons[button]
-        self.input_field.setText(self.current_data['categories'][index][0])
+        self.input_field.setText(self.current_data['categories'][index[0]][index[1]])
         self.input_field.show()
         self.overlay.show()
         self.input_field.setFocus()
@@ -145,13 +151,13 @@ class GameBoard(QWidget):
         button = self.editing_button
         index = self.category_buttons[button]
 
-        if not new_text or new_text == self.current_data["categories"][index][0]:
+        if not new_text or new_text == self.current_data["categories"][index[0]][index[1]]:
             self.input_field.hide()
             self.overlay.hide()
             return
 
         button.setText(wrap_text(new_text))
-        self.current_data['categories'][index][0] = new_text
+        self.current_data['categories'][index[0]][index[1]] = new_text
 
         self.input_field.hide()
         self.overlay.hide()
