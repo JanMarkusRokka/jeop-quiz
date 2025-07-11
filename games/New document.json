@@ -7,11 +7,18 @@
     "4": ["CategoryTitle4", [100, "Kas ja kuidas ja kas ja kuidas ja kas?"], [200, "Kes?"], [300, "Kus?"], [400, "Millal"], [500, "Milleks?"]],
     "5": ["CategoryTitle5", [100, "Kas ja kuidas ja kas ja kuidas ja kas?"], [200, "Kes?"], [300, "Kus?"], [400, "Millal"], [500, "Milleks?"]]
   },
-  "null": null,
-  "number": 123,
-  "object": {
-    "a": "b",
-    "c": "d"
-  },
-  "string": "Hello World"
+  "saved_games": {
+    "save1": {
+      "board_state": [[true,true,false,false,false],
+                      [true,true,true,false,false],
+                      [false,false,false,false,false],
+                      [true,false,false,false,false],
+                      [true,true,true,true,false]],
+      "teams": [
+        ["EPic pepol", 300],
+        ["Bruddas", 600],
+        ["ayy lmao", 1100]
+      ]
+    }
+  }
 }

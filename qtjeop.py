@@ -35,6 +35,27 @@ class GameSelector(QWidget):
         super().__init__()
         self.load_game_callback = load_game_callback
         self.init_ui()
+        # Overlay
+        self.overlay = QWidget(self)
+        self.overlay.setStyleSheet("background-color: rgba(0, 0, 0, 160);")
+        self.overlay.hide()
+
+        self.select_label = QLabel(self.overlay)
+        self.select_label.setFont(QFont("Arial", 12))
+        self.select_label.setStyleSheet("color: 'white'")
+        self.select_label.setText("Select mode:")
+        self.select_label.setAlignment(Qt.AlignCenter)
+        self.select_label.hide()
+
+        self.play_button = QPushButton(self.overlay)
+        self.play_button.setFont(QFont("Arial", 12))
+        self.play_button.setText("Play") # fix placement
+        self.play_button.hide()
+
+        self.edit_button = QPushButton(self.overlay)
+        self.edit_button.setFont(QFont("Arial", 12))
+        self.edit_button.setText("Edit") # fix placement
+        self.edit_button.hide()
 
     def init_ui(self):
         layout = QVBoxLayout()
@@ -46,12 +67,29 @@ class GameSelector(QWidget):
         for name, path in games.items():
             button = QPushButton(name)
             button.setFont(QFont("Arial", 12))
-            button.clicked.connect(lambda _, p=path: self.load_game_callback(p))
+            button.clicked.connect(lambda _, p=path: self.select_mode(p))
             layout.addWidget(button)
 
         layout.addStretch()
         self.setLayout(layout)
-
+    
+    def select_mode(self, path):
+        self.select_label.show()
+        self.play_button.show()
+        self.edit_button.show()
+        #button.clicked.connect(lambda _, p=path: self.load_game_callback(p))
+        self.overlay.show()
+    
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        self.overlay.setGeometry(0, 0, self.width(), self.height())
+        self.center_overlay_elements()
+    
+    def center_overlay_elements(self):
+        self.select_label.move(
+            (self.width() - self.select_label.width()) // 2,
+            (self.height() - self.select_label.height()) // 2
+        )
 
 class GameBoard(QWidget):
     def __init__(self, return_to_menu_callback):
@@ -118,12 +156,11 @@ class GameBoard(QWidget):
 
             cat_button = QPushButton(cat_title)
             cat_button.setFont(QFont("Arial", 11))
-            cat_button.setFixedWidth(120)
+            #cat_button.setFixedWidth(120)
             cat_button.setStyleSheet('text-align: center; white-space: normal;')
             if (self.edit_mode):
                 cat_button.clicked.connect(lambda _, b=cat_button: self.edit_field(b))
-            #else:
-            #    cat_button.clicked.connect(lambda _, b=cat_button: self.play_field()) WORKING ON THIS RN brudda
+                
             self.grid.addWidget(cat_button, 0, col)
 
             self.category_buttons[cat_button] = (cat_id, 0)
@@ -134,8 +171,15 @@ class GameBoard(QWidget):
                 q_button.setFont(QFont("Arial", 10))
                 if (self.edit_mode):
                     q_button.clicked.connect(lambda _, b=q_button: self.edit_field(b))
+                else:
+                    q_button.clicked.connect(lambda _, b=q_button: self.play_field(b))
+                    if (self.current_data['saved_games']['save1']['board_state'][col-1][row-1]):
+                        q_button.setStyleSheet("background-color: darkgrey")
                 self.grid.addWidget(q_button, row, col)
                 self.category_buttons[q_button] = (cat_id, row)
+
+    def play_field(self, button):
+        print('play field')
 
     def edit_field(self, button):
         index = self.category_buttons[button]
