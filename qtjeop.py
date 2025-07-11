@@ -49,12 +49,14 @@ class GameSelector(QWidget):
 
         self.play_button = QPushButton(self.overlay)
         self.play_button.setFont(QFont("Arial", 12))
-        self.play_button.setText("Play") # fix placement
+        self.play_button.setStyleSheet("color: 'white'")
+        self.play_button.setText("Play")
         self.play_button.hide()
 
         self.edit_button = QPushButton(self.overlay)
         self.edit_button.setFont(QFont("Arial", 12))
-        self.edit_button.setText("Edit") # fix placement
+        self.edit_button.setStyleSheet("color: 'white'")
+        self.edit_button.setText("Edit")
         self.edit_button.hide()
 
     def init_ui(self):
@@ -73,12 +75,23 @@ class GameSelector(QWidget):
         layout.addStretch()
         self.setLayout(layout)
     
+    def hide_overlay(self):
+        self.select_label.hide()
+        self.play_button.hide()
+        self.edit_button.hide()
+        self.overlay.hide()
+
     def select_mode(self, path):
         self.select_label.show()
         self.play_button.show()
         self.edit_button.show()
-        #button.clicked.connect(lambda _, p=path: self.load_game_callback(p))
+        self.play_button.clicked.connect(lambda _, p=path: self.load_game(p, False))
+        self.edit_button.clicked.connect(lambda _, p=path: self.load_game(p, True))
         self.overlay.show()
+
+    def load_game(self, path, edit_mode):
+        self.hide_overlay()
+        self.load_game_callback(path, edit_mode)
     
     def resizeEvent(self, event):
         super().resizeEvent(event)
@@ -90,6 +103,23 @@ class GameSelector(QWidget):
             (self.width() - self.select_label.width()) // 2,
             (self.height() - self.select_label.height()) // 2
         )
+        self.play_button.move(
+            (self.width() - self.select_label.width()) // 3,
+            ((self.height() - self.select_label.height()) // 3) * 2
+        )
+        self.edit_button.move(
+            ((self.width() - self.select_label.width()) // 3) * 2,
+            ((self.height() - self.select_label.height()) // 3) * 2
+        )
+
+class Player:
+    def __init__(self, name="", points=0):
+        super().__init__()
+        self.name = name
+        self.points = points
+
+    def setPoints(self, points):
+        self.points = points
 
 class GameBoard(QWidget):
     def __init__(self, return_to_menu_callback):
@@ -131,7 +161,8 @@ class GameBoard(QWidget):
             (self.height() - self.input_field.height()) // 2
         )
 
-    def load_game(self, path):
+    def load_game(self, path, edit_mode):
+        self.edit_mode = edit_mode
         # Clear previous widgets
         while self.grid.count():
             item = self.grid.takeAt(0)
@@ -150,7 +181,7 @@ class GameBoard(QWidget):
         self.grid.addWidget(back_btn, 0, 0)
 
         categories = self.current_data["categories"]
-
+        i = 0
         for col, cat_id in enumerate(categories.keys(), start=1):
             cat_title = categories[cat_id][0]
 
@@ -177,6 +208,17 @@ class GameBoard(QWidget):
                         q_button.setStyleSheet("background-color: darkgrey")
                 self.grid.addWidget(q_button, row, col)
                 self.category_buttons[q_button] = (cat_id, row)
+                i = row
+        if not self.edit_mode:
+            team_layout = QHBoxLayout()
+            #team_grid.setContentsMargins(10, 10, 10, 10)
+            #team_grid.setSpacing(10)
+            for team in self.current_data['saved_games']['save1']['teams']:
+                team_button = QPushButton(team[0] + " " + str(team[1]))
+                team_button.setFont(QFont('Arial', 10))
+                team_layout.addWidget(team_button)
+                print(team)
+            self.layout.addLayout(team_layout)
 
     def play_field(self, button):
         print('play field')
@@ -228,8 +270,8 @@ class MainWindow(QWidget):
 
         self.show_menu()
 
-    def load_game(self, path):
-        self.board.load_game(path)
+    def load_game(self, path, edit_mode):
+        self.board.load_game(path, edit_mode)
         self.stack.setCurrentWidget(self.board)
 
     def show_menu(self):
