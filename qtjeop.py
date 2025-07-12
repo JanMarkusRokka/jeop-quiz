@@ -41,6 +41,26 @@ def delete_layout_recursive(layout):
                 delete_layout_recursive(child.layout())
         layout.deleteLater()
 
+class DropLabel(QLabel):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setAcceptDrops(True)
+
+    def dragEnterEvent(self, event):
+        if event.mimeData().hasUrls():
+            event.acceptProposedAction()
+
+    def dragMoveEvent(self, event):
+        if event.mimeData().hasUrls():
+            event.acceptProposedAction()
+
+    def dropEvent(self, event):
+        if event.mimeData().hasUrls():
+            for url in event.mimeData().urls():
+                file_path = url.toLocalFile()
+                if file_path:  # Ensure it's a local file
+                    self.setText(file_path)
+            event.acceptProposedAction()
 
 class GameSelector(QWidget):
     def __init__(self, load_game_callback):
@@ -169,6 +189,14 @@ class GameBoard(QWidget):
         self.input_field.setStyleSheet("color: 'white'")
         self.input_field.setAlignment(Qt.AlignCenter)
         self.input_field.hide()
+
+        self.file_drop = DropLabel(self.overlay)
+        self.file_drop.setFont(QFont("Arial", font_size))
+        self.file_drop.setText('Drop a file here:')
+        self.file_drop.setStyleSheet("QLabel { color: white; background-color: black; border: 2px dashed gray; }")
+        self.file_drop.setAlignment(Qt.AlignCenter)
+        self.file_drop.hide()
+
         self.edit_mode = False
         self.teams_layout = None
 
@@ -193,6 +221,10 @@ class GameBoard(QWidget):
         self.input_field.move(
             (self.width() - self.input_field.width()) // 2,
             (self.height() - self.input_field.height()) // 2
+        )
+        self.file_drop.move(
+            (self.width() - self.file_drop.width()) // 2,
+            ((self.height() - self.file_drop.height()) * 2) // 3
         )
         self.play_label.move(
             (self.width() - self.play_label.width()) // 2,
@@ -303,6 +335,10 @@ class GameBoard(QWidget):
         self.current_data['saved_games']['save1']['board_state'][int(index[0]) - 1][index[1]-1] = True
         self.play_label.setText(self.current_data['categories'][index[0]][index[1]][1])
         self.current_question = self.current_data['categories'][index[0]][index[1]]
+        # if question has a file
+        if len(self.current_question[2]) > 0:
+            path = self.current_question[2]
+            print(path[-4:])
         for team_button in self.team_buttons:
             team_button.show()
         self.overlay.show()
@@ -332,6 +368,11 @@ class GameBoard(QWidget):
             self.input_field.setText(changeable)
         else:
             self.input_field.setText(changeable[1])
+            self.file_drop.show()
+            if len(changeable[2]) > 0:
+                self.file_drop.setText(changeable[2])
+            else:
+                self.file_drop.setText('Drop a file here:')
         self.input_field.show()
         self.overlay.show()
         self.input_field.setFocus()
@@ -354,7 +395,12 @@ class GameBoard(QWidget):
             if not new_text or new_text == self.current_data["categories"][index[0]][index[1]][1]:
                 self.input_field.hide()
                 self.overlay.hide()
+                self.file_drop.hide()
                 return
+            self.file_drop.hide()
+            if (len(self.file_drop.text()) > 0):
+                self.current_data["categories"][index[0]][index[1]][2] = self.file_drop.text()
+            #self.file_drop.setText('')
             button.setText(str(self.current_data["categories"][index[0]][index[1]][0]) + '\n' + wrap_text(new_text))
             self.current_data['categories'][index[0]][index[1]][1] = new_text
 

@@ -5,115 +5,140 @@
             "Sport",
             [
                 100,
-                "Kas da as d"
+                "Kas sadsadasds",
+                "C:/Users/JanMa/jeop/jeop-quiz/games/NewDocument/foto.jpg"
             ],
             [
                 200,
-                "Kes?"
+                "Kes?",
+                ""
             ],
             [
                 300,
-                "Kus?"
+                "Kus?",
+                ""
             ],
             [
                 400,
-                "Millal"
+                "Millal",
+                ""
             ],
             [
                 500,
-                "Milleks?"
+                "Milleks?",
+                ""
             ]
         ],
         "2": [
-            "Kultuur",
+            "Sport",
             [
                 100,
-                "Kas j"
+                "Kas da as d",
+                ""
             ],
             [
                 200,
-                "Kes?"
+                "Kes?",
+                ""
             ],
             [
                 300,
-                "Kus?"
+                "Kus?",
+                ""
             ],
             [
                 400,
-                "Millal"
+                "Millal",
+                ""
             ],
             [
                 500,
-                "Milleks?"
+                "Milleks?",
+                ""
             ]
         ],
         "3": [
-            "CategoryTitle3",
+            "Sport",
             [
                 100,
-                "Kas ja kuidas ja kas ja kuidas ja kas?"
+                "Kas da as d",
+                ""
             ],
             [
                 200,
-                "Kes?"
+                "Kes?",
+                ""
             ],
             [
                 300,
-                "Kus?"
+                "Kus?",
+                ""
             ],
             [
                 400,
-                "Millal"
+                "Millal",
+                ""
             ],
             [
                 500,
-                "Milleks?"
+                "Milleks?",
+                ""
             ]
         ],
         "4": [
-            "CategoryTitle4",
+            "Sport",
             [
                 100,
-                "Kas ja kuidas ja kas ja kuidas ja kas?"
+                "Kas da as d",
+                ""
             ],
             [
                 200,
-                "Kes?"
+                "Kes?",
+                ""
             ],
             [
                 300,
-                "Kus?"
+                "Kus?",
+                ""
             ],
             [
                 400,
-                "Millal"
+                "Millal",
+                ""
             ],
             [
                 500,
-                "Milleks?"
+                "Milleks?",
+                ""
             ]
         ],
         "5": [
-            "Varia",
+            "Sport",
             [
                 100,
-                "Kas ja kuidas ja kas ja kuidas ja kas?"
+                "Kas da as d",
+                ""
             ],
             [
                 200,
-                "Kes?"
+                "Kes?",
+                ""
             ],
             [
                 300,
-                "Kus?"
+                "Kus?",
+                ""
             ],
             [
                 400,
-                "Millal"
+                "Millal",
+                ""
             ],
             [
                 500,
-                "Milleks?"
+                "Milleks?",
+                ""
             ]
         ]
     },
