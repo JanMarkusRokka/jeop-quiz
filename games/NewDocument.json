@@ -1,0 +1,179 @@
+{
+    "title": "testname",
+    "categories": {
+        "1": [
+            "Sport",
+            [
+                100,
+                "Kas da as d"
+            ],
+            [
+                200,
+                "Kes?"
+            ],
+            [
+                300,
+                "Kus?"
+            ],
+            [
+                400,
+                "Millal"
+            ],
+            [
+                500,
+                "Milleks?"
+            ]
+        ],
+        "2": [
+            "Kultuur",
+            [
+                100,
+                "Kas j"
+            ],
+            [
+                200,
+                "Kes?"
+            ],
+            [
+                300,
+                "Kus?"
+            ],
+            [
+                400,
+                "Millal"
+            ],
+            [
+                500,
+                "Milleks?"
+            ]
+        ],
+        "3": [
+            "CategoryTitle3",
+            [
+                100,
+                "Kas ja kuidas ja kas ja kuidas ja kas?"
+            ],
+            [
+                200,
+                "Kes?"
+            ],
+            [
+                300,
+                "Kus?"
+            ],
+            [
+                400,
+                "Millal"
+            ],
+            [
+                500,
+                "Milleks?"
+            ]
+        ],
+        "4": [
+            "CategoryTitle4",
+            [
+                100,
+                "Kas ja kuidas ja kas ja kuidas ja kas?"
+            ],
+            [
+                200,
+                "Kes?"
+            ],
+            [
+                300,
+                "Kus?"
+            ],
+            [
+                400,
+                "Millal"
+            ],
+            [
+                500,
+                "Milleks?"
+            ]
+        ],
+        "5": [
+            "Varia",
+            [
+                100,
+                "Kas ja kuidas ja kas ja kuidas ja kas?"
+            ],
+            [
+                200,
+                "Kes?"
+            ],
+            [
+                300,
+                "Kus?"
+            ],
+            [
+                400,
+                "Millal"
+            ],
+            [
+                500,
+                "Milleks?"
+            ]
+        ]
+    },
+    "saved_games": {
+        "save1": {
+            "board_state": [
+                [
+                    true,
+                    true,
+                    true,
+                    true,
+                    true
+                ],
+                [
+                    true,
+                    true,
+                    true,
+                    false,
+                    false
+                ],
+                [
+                    true,
+                    true,
+                    true,
+                    false,
+                    false
+                ],
+                [
+                    true,
+                    false,
+                    false,
+                    false,
+                    false
+                ],
+                [
+                    true,
+                    true,
+                    true,
+                    true,
+                    false
+                ]
+            ],
+            "teams": [
+                [
+                    "EPic pepol",
+                    2700
+                ],
+                [
+                    "Bruddas",
+                    1000
+                ],
+                [
+                    "ayy lmao",
+                    1600
+                ],
+                [
+                    "tiim4",
+                    0
+                ]
+            ]
+        }
+    }
+}

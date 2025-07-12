@@ -4,11 +4,12 @@ import json
 from PyQt5.QtWidgets import (
     QApplication, QWidget, QPushButton, QLabel,
     QVBoxLayout, QHBoxLayout, QGridLayout, QLineEdit,
-    QStackedWidget, QScrollArea, QFrame
+    QStackedWidget, QScrollArea, QFrame, QCheckBox
 )
 from PyQt5.QtGui import QFont, QIcon
 from PyQt5.QtCore import Qt
 
+font_size = 14
 
 def find_games():
     games = {}
@@ -30,6 +31,17 @@ def wrap_text(text, max_line_length=15):
     lines.append(line.strip())
     return "\n".join(lines)
 
+def delete_layout_recursive(layout):
+    if layout is not None:
+        while layout.count():
+            child = layout.takeAt(0)
+            if child.widget() is not None:
+                child.widget().deleteLater()
+            elif child.layout() is not None:
+                delete_layout_recursive(child.layout())
+        layout.deleteLater()
+
+
 class GameSelector(QWidget):
     def __init__(self, load_game_callback):
         super().__init__()
@@ -41,20 +53,20 @@ class GameSelector(QWidget):
         self.overlay.hide()
 
         self.select_label = QLabel(self.overlay)
-        self.select_label.setFont(QFont("Arial", 12))
+        self.select_label.setFont(QFont("Arial", font_size))
         self.select_label.setStyleSheet("color: 'white'")
         self.select_label.setText("Select mode:")
         self.select_label.setAlignment(Qt.AlignCenter)
         self.select_label.hide()
 
         self.play_button = QPushButton(self.overlay)
-        self.play_button.setFont(QFont("Arial", 12))
+        self.play_button.setFont(QFont("Arial", font_size))
         self.play_button.setStyleSheet("color: 'white'")
         self.play_button.setText("Play")
         self.play_button.hide()
 
         self.edit_button = QPushButton(self.overlay)
-        self.edit_button.setFont(QFont("Arial", 12))
+        self.edit_button.setFont(QFont("Arial", font_size))
         self.edit_button.setStyleSheet("color: 'white'")
         self.edit_button.setText("Edit")
         self.edit_button.hide()
@@ -62,13 +74,13 @@ class GameSelector(QWidget):
     def init_ui(self):
         layout = QVBoxLayout()
         label = QLabel("Select a game:")
-        label.setFont(QFont("Arial", 14))
+        label.setFont(QFont("Arial", font_size))
         layout.addWidget(label)
 
         games = find_games()
         for name, path in games.items():
             button = QPushButton(name)
-            button.setFont(QFont("Arial", 12))
+            button.setFont(QFont("Arial", font_size))
             button.clicked.connect(lambda _, p=path: self.select_mode(p))
             layout.addWidget(button)
 
@@ -88,9 +100,12 @@ class GameSelector(QWidget):
         self.play_button.clicked.connect(lambda _, p=path: self.load_game(p, False))
         self.edit_button.clicked.connect(lambda _, p=path: self.load_game(p, True))
         self.overlay.show()
+        self.center_overlay_elements()
 
     def load_game(self, path, edit_mode):
         self.hide_overlay()
+        self.play_button.clicked.disconnect()
+        self.edit_button.clicked.disconnect()
         self.load_game_callback(path, edit_mode)
     
     def resizeEvent(self, event):
@@ -134,34 +149,61 @@ class GameBoard(QWidget):
         self.grid.setContentsMargins(10, 10, 10, 10)
         self.grid.setSpacing(10)
 
-        self.layout.addWidget(self.grid_widget)
+        self.layout.addWidget(self.grid_widget, 2)
 
         # Overlay
         self.overlay = QWidget(self)
-        self.overlay.setStyleSheet("background-color: rgba(0, 0, 0, 160);")
+        self.overlay.setStyleSheet("background-color: rgba(0, 0, 0, 200);")
         self.overlay.hide()
 
+        self.play_label = QLabel(self.overlay)
+        self.play_label.setFont(QFont("Arial", font_size))
+        self.play_label.setStyleSheet("color: 'white'")
+        self.play_label.setText("")
+        self.play_label.setAlignment(Qt.AlignCenter)
+        self.play_label.hide()
+
         self.input_field = QLineEdit(self.overlay)
-        self.input_field.setFont(QFont("Arial", 12))
+        self.input_field.setFont(QFont("Arial", font_size))
         self.input_field.setFixedWidth(300)
+        self.input_field.setStyleSheet("color: 'white'")
         self.input_field.setAlignment(Qt.AlignCenter)
         self.input_field.hide()
         self.edit_mode = False
+        self.teams_layout = None
 
+        self.auto_save = False
+
+        self.current_question = None
         self.input_field.returnPressed.connect(self.save_edit)
+        #self.play_label.keyPressEvent = self.keyPressEvent
+
+    def keyPressEvent(self, event):
+        if not self.edit_mode and not self.play_label.isHidden():
+            if event.key() == 16777220 or event.key == Qt.Key.Key_Enter :
+                self.finish_play_field()
+                print('enter')
 
     def resizeEvent(self, event):
         super().resizeEvent(event)
         self.overlay.setGeometry(0, 0, self.width(), self.height())
-        self.center_input()
+        self.center_overlay()
 
-    def center_input(self):
+    def center_overlay(self):
         self.input_field.move(
             (self.width() - self.input_field.width()) // 2,
             (self.height() - self.input_field.height()) // 2
         )
+        self.play_label.move(
+            (self.width() - self.play_label.width()) // 2,
+            (self.height() - self.play_label.height()) // 2
+        )
+
+    def switch_autosave(self):
+        self.auto_save = not self.auto_save
 
     def load_game(self, path, edit_mode):
+        self.path = path
         self.edit_mode = edit_mode
         # Clear previous widgets
         while self.grid.count():
@@ -169,6 +211,7 @@ class GameBoard(QWidget):
             widget = item.widget()
             if widget is not None:
                 widget.deleteLater()
+        delete_layout_recursive(self.teams_layout)
 
         with open(path, 'r', encoding='utf-8') as f:
             self.current_data = json.load(f)
@@ -177,8 +220,14 @@ class GameBoard(QWidget):
         # Back button
         back_btn = QPushButton("✖")
         back_btn.setFixedSize(40, 40)
+        back_btn.clicked.connect(self.save)
         back_btn.clicked.connect(self.return_to_menu_callback)
         self.grid.addWidget(back_btn, 0, 0)
+        autosave_checkmark = QCheckBox()
+        autosave_checkmark.setText("♲")
+        autosave_checkmark.setFixedSize(40, 40)
+        autosave_checkmark.clicked.connect(self.switch_autosave)
+        self.grid.addWidget(autosave_checkmark, 1, 0)
 
         categories = self.current_data["categories"]
         i = 0
@@ -186,7 +235,8 @@ class GameBoard(QWidget):
             cat_title = categories[cat_id][0]
 
             cat_button = QPushButton(cat_title)
-            cat_button.setFont(QFont("Arial", 11))
+
+            cat_button.setFont(QFont("Arial", font_size))
             #cat_button.setFixedWidth(120)
             cat_button.setStyleSheet('text-align: center; white-space: normal;')
             if (self.edit_mode):
@@ -199,8 +249,9 @@ class GameBoard(QWidget):
             questions = self.current_data["categories"][cat_id][1:]
             for row, question in enumerate(questions, start=1):
                 q_button = QPushButton(str(question[0]))
-                q_button.setFont(QFont("Arial", 10))
+                q_button.setFont(QFont("Arial", font_size))
                 if (self.edit_mode):
+                    q_button.setText(str(question[0]) + '\n' + wrap_text(question[1]))
                     q_button.clicked.connect(lambda _, b=q_button: self.edit_field(b))
                 else:
                     q_button.clicked.connect(lambda _, b=q_button: self.play_field(b))
@@ -209,42 +260,106 @@ class GameBoard(QWidget):
                 self.grid.addWidget(q_button, row, col)
                 self.category_buttons[q_button] = (cat_id, row)
                 i = row
+
         if not self.edit_mode:
-            team_layout = QHBoxLayout()
+            self.team_buttons = []
+            self.teams_layout = QHBoxLayout()
             #team_grid.setContentsMargins(10, 10, 10, 10)
             #team_grid.setSpacing(10)
-            for team in self.current_data['saved_games']['save1']['teams']:
-                team_button = QPushButton(team[0] + " " + str(team[1]))
-                team_button.setFont(QFont('Arial', 10))
+            for id, team in enumerate(self.current_data['saved_games']['save1']['teams'], start=0):
+                team_layout = QVBoxLayout()
+                team_addsub_layout = QHBoxLayout()
+
+                team_button = QPushButton(team[0] + " \n " + str(team[1]))
+                team_button.setFont(QFont('Arial', font_size))
                 team_layout.addWidget(team_button)
-                print(team)
-            self.layout.addLayout(team_layout)
+
+                team_button_add = QPushButton('+')
+                team_button_sub = QPushButton('-')
+                team_button_add.setFont(QFont('Arial', font_size))
+                team_button_sub.setFont(QFont('Arial', font_size))
+                team_button_add.clicked.connect(lambda _, tb=team_button, id=id: self.modify_points(id, tb))
+                team_button_sub.clicked.connect(lambda _, tb=team_button, id=id: self.modify_points(id, tb, -1))
+                team_addsub_layout.addWidget(team_button_add)
+                team_addsub_layout.addWidget(team_button_sub)
+                team_button_add.hide()
+                team_button_sub.hide()
+                self.team_buttons.append(team_button_add)
+                self.team_buttons.append(team_button_sub)
+                team_layout.addLayout(team_addsub_layout)
+
+                self.teams_layout.addLayout(team_layout)
+            self.layout.addLayout(self.teams_layout)
+
+    def save(self):
+        data = json.dumps(self.current_data, indent=4)
+        with open(self.path, 'w', encoding='utf-8') as f:
+            f.write(data)
+
 
     def play_field(self, button):
-        print('play field')
+        index = self.category_buttons[button]
+        button.setStyleSheet("background-color: darkgrey")
+        self.current_data['saved_games']['save1']['board_state'][int(index[0]) - 1][index[1]-1] = True
+        self.play_label.setText(self.current_data['categories'][index[0]][index[1]][1])
+        self.current_question = self.current_data['categories'][index[0]][index[1]]
+        for team_button in self.team_buttons:
+            team_button.show()
+        self.overlay.show()
+        self.play_label.show()
+        self.center_overlay()
+    
+    def modify_points(self, team_id, button, multiplier=1):
+        points = self.current_question[0]
+        print(self.current_data['saved_games']['save1']['teams'][team_id][1], points)
+        self.current_data['saved_games']['save1']['teams'][team_id][1] += points * multiplier
+        team = self.current_data['saved_games']['save1']['teams'][team_id]
+        button.setText(team[0] + " \n " + str(team[1]))
+    
+    def finish_play_field(self):
+        self.play_label.setText('')
+        for team_button in self.team_buttons:
+            team_button.hide()
+        if self.auto_save:
+            self.save()
+        self.overlay.hide()
+        self.play_label.hide()
 
     def edit_field(self, button):
         index = self.category_buttons[button]
-        self.input_field.setText(self.current_data['categories'][index[0]][index[1]])
+        changeable = self.current_data['categories'][index[0]][index[1]]
+        if isinstance(changeable, str):
+            self.input_field.setText(changeable)
+        else:
+            self.input_field.setText(changeable[1])
         self.input_field.show()
         self.overlay.show()
         self.input_field.setFocus()
         self.editing_button = button
-        self.center_input()
+        self.center_overlay()
 
     def save_edit(self):
         new_text = self.input_field.text()
         button = self.editing_button
         index = self.category_buttons[button]
 
-        if not new_text or new_text == self.current_data["categories"][index[0]][index[1]]:
-            self.input_field.hide()
-            self.overlay.hide()
-            return
+        if isinstance(self.current_data["categories"][index[0]][index[1]], str):
+            if not new_text or new_text == self.current_data["categories"][index[0]][index[1]]:
+                self.input_field.hide()
+                self.overlay.hide()
+                return
+            button.setText(wrap_text(new_text))
+            self.current_data['categories'][index[0]][index[1]] = new_text
+        else:
+            if not new_text or new_text == self.current_data["categories"][index[0]][index[1]][1]:
+                self.input_field.hide()
+                self.overlay.hide()
+                return
+            button.setText(str(self.current_data["categories"][index[0]][index[1]][0]) + '\n' + wrap_text(new_text))
+            self.current_data['categories'][index[0]][index[1]][1] = new_text
 
-        button.setText(wrap_text(new_text))
-        self.current_data['categories'][index[0]][index[1]] = new_text
-
+        if self.auto_save:
+            self.save()
         self.input_field.hide()
         self.overlay.hide()
         print(self.current_data)
