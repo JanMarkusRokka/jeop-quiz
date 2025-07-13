@@ -5,7 +5,7 @@
             "Sport",
             [
                 100,
-                "Kas sadsadasds",
+                "Kas sadsadasd",
                 "C:/Users/JanMa/jeop/jeop-quiz/games/NewDocument/foto.jpg",
                 "correct answer here"
             ],
@@ -71,8 +71,8 @@
             "Sport",
             [
                 100,
-                "Kas sadsadasds",
-                "C:/Users/JanMa/jeop/jeop-quiz/games/NewDocument/foto.jpg",
+                "Mis muusika",
+                "C:/Users/JanMa/Downloads/Project_4 (1).mp3",
                 "correct answer here"
             ],
             [
@@ -110,7 +110,7 @@
             ],
             [
                 200,
-                "Ke",
+                "Kes",
                 "Drop a file here:",
                 "correct answer here"
             ],
@@ -193,7 +193,7 @@
                 ],
                 [
                     true,
-                    false,
+                    true,
                     false,
                     false,
                     false
@@ -213,7 +213,7 @@
                 ],
                 [
                     "Bruddas",
-                    1000
+                    1200
                 ],
                 [
                     "ayy lmao",

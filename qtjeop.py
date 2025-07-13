@@ -7,9 +7,13 @@ from PyQt5.QtWidgets import (
     QStackedWidget, QScrollArea, QFrame, QCheckBox
 )
 from PyQt5.QtGui import QFont, QIcon, QPixmap
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QUrl, QFileInfo
+from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 
 font_size = 14
+image_file_extensions = ['.jpg', '.png']
+sound_file_extensions = ['.mp3', '.wav']
+video_file_extensions = ['.mp4', '.webm']
 
 def find_games():
     games = {}
@@ -36,10 +40,38 @@ def delete_layout_recursive(layout):
         while layout.count():
             child = layout.takeAt(0)
             if child.widget() is not None:
+                child.widget().setParent(None)
                 child.widget().deleteLater()
             elif child.layout() is not None:
                 delete_layout_recursive(child.layout())
-        layout.deleteLater()
+        parent = layout.parent
+        if isinstance(parent, QWidget):
+            parent.setLayout(None)
+
+class PlayStopButton(QPushButton):
+    def __init__(self, path, player, parent=None):
+        super().__init__(parent)
+        self.setText('►')
+        self.setStyleSheet('color: white')
+        self.setFont(QFont('Arial', font_size + 4))
+        self.path = path
+        self.player = player
+        self.clicked.connect(self.playStop)
+
+    def playStop(self):
+        if self.text() == '►':
+            self.play()
+        elif self.text() == '■':
+            self.stop()
+    
+    def play(self):
+        self.player.setMedia(QMediaContent(QUrl.fromLocalFile(QFileInfo(self.path).absoluteFilePath())))
+        self.player.play()
+        self.setText('■')
+    
+    def stop(self):
+        self.player.stop()
+        self.setText('►')
 
 class DropLabel(QLabel):
     def __init__(self, parent=None):
@@ -246,10 +278,11 @@ class GameBoard(QWidget):
             (self.width() - self.answer_label.width()) // 2,
             self.play_label.y() + int(self.play_label.y() * 0.2)
         )
-        if self.current_image is not None and self.file_showcase is not None:
-            pixmap = self.current_image.scaledToHeight(self.height() // 3)
-            self.file_showcase.setPixmap(pixmap)
-            self.file_showcase.resize(pixmap.size())
+        if self.file_showcase is not None:
+            if self.current_image is not None:
+                    pixmap = self.current_image.scaledToHeight(self.height() // 3)
+                    self.file_showcase.setPixmap(pixmap)
+                    self.file_showcase.resize(pixmap.size())
             self.file_showcase.move(
                 (self.width() - self.file_showcase.width()) // 2,
                 ((self.height() - self.file_showcase.height()) * 2) // 3
@@ -363,13 +396,17 @@ class GameBoard(QWidget):
         # if question has a file
         if len(self.current_question[2]) > 0:
             path = self.current_question[2]
+            extension = path[-4:]
             # jpg or png image, the display it
-            if path[-4:] == '.jpg' or path[-4:] == '.png':
+            if extension in image_file_extensions:
                 self.file_showcase = QLabel(self.overlay)
                 self.current_image = QPixmap(path)
                 pixmap = self.current_image.scaledToHeight(self.height() // 3)
                 self.file_showcase.setPixmap(pixmap)
-            # elif path[-4:] == ''
+            elif extension in sound_file_extensions:
+                self.file_showcase = PlayStopButton(path, player, parent=self.overlay)
+            elif extension in video_file_extensions:
+                print('video')
 
         for team_button in self.team_buttons:
             team_button.show()
@@ -393,7 +430,12 @@ class GameBoard(QWidget):
         for team_button in self.team_buttons:
             team_button.hide()
         if self.file_showcase is not None:
+            if isinstance(self.file_showcase, PlayStopButton):
+                self.file_showcase.stop()
             self.file_showcase.hide()
+            self.file_showcase.deleteLater()
+            self.file_showcase = None
+        self.current_image = None
         self.answer_label.hide()
         self.overlay.hide()
         self.play_label.hide()
@@ -470,9 +512,9 @@ class MainWindow(QWidget):
     def show_menu(self):
         self.stack.setCurrentWidget(self.selector)
 
-
 if __name__ == "__main__":
     app = QApplication(sys.argv)
+    player = QMediaPlayer()
     #app.setStyle('Fusion')
     window = MainWindow()
     window.show()
