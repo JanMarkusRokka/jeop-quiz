@@ -14,7 +14,7 @@ from PyQt5.QtMultimediaWidgets import QVideoWidget
 font_size = 14
 image_file_extensions = ['.jpg', '.png']
 sound_file_extensions = ['.mp3', '.wav']
-video_file_extensions = ['.mp4', '.webm']
+video_file_extensions = ['.mp4', '.webm', '.wmv']
 
 def find_games():
     games = {}
@@ -75,16 +75,21 @@ class PlayStopButton(QPushButton):
         self.setText('►')
 
 class VideoPlayer(QVideoWidget):
-    def __init__(self, player, path, parent=None):
+    def __init__(self, player, parent=None):
         super().__init__(parent)
         self.player = player
-        self.playButton = QPushButton(self)
+        self.playButton = QPushButton(parent)
+        self.playButton.setStyleSheet('color: white')
         self.playButton.setIcon(self.style().standardIcon(QStyle.SP_MediaPlay))
         self.playButton.clicked.connect(self.play)
+        self.player.setVideoOutput(self)
+        # self.player.play()
+    
+    def setPath(self, path):
         if path != '':
             self.player.setMedia(
                     QMediaContent(QUrl.fromLocalFile(path)))
-    
+
     def play(self):
         if self.player.state() == QMediaPlayer.PlayingState:
             self.player.pause()
@@ -92,8 +97,7 @@ class VideoPlayer(QVideoWidget):
             self.player.play()
     
     def stop(self):
-        if self.player.state() == QMediaPlayer.PlayingState:
-            self.player.stop()
+        self.player.stop()
 
 class DropLabel(QLabel):
     def __init__(self, parent=None):
@@ -305,6 +309,12 @@ class GameBoard(QWidget):
                     pixmap = self.current_image.scaledToHeight(self.height() // 3)
                     self.file_showcase.setPixmap(pixmap)
                     self.file_showcase.resize(pixmap.size())
+            if isinstance(self.file_showcase, VideoPlayer):
+               self.file_showcase.resize(self.width() // 3, self.height() // 3)
+               self.file_showcase.playButton.move(
+                    (self.width() - self.file_showcase.playButton.width()) // 2,
+                    (self.play_label.y() - int(self.file_showcase.playButton.height() * 1.5))
+               )
             self.file_showcase.move(
                 (self.width() - self.file_showcase.width()) // 2,
                 ((self.height() - self.file_showcase.height()) * 2) // 3
@@ -352,7 +362,7 @@ class GameBoard(QWidget):
             cat_button.setStyleSheet('text-align: center; white-space: normal;')
             if (self.edit_mode):
                 cat_button.clicked.connect(lambda _, b=cat_button: self.edit_field(b))
-                
+
             self.grid.addWidget(cat_button, 0, col)
 
             self.category_buttons[cat_button] = (cat_id, 0)
@@ -428,8 +438,10 @@ class GameBoard(QWidget):
             elif extension in sound_file_extensions:
                 self.file_showcase = PlayStopButton(path, player, parent=self.overlay)
             elif extension in video_file_extensions:
-                self.file_showcase = VideoPlayer(player, path, self.overlay)
-
+                self.file_showcase = VideoPlayer(player, self.overlay)
+                self.file_showcase.setPath(path)
+                #self.file_showcase.play()
+                
         for team_button in self.team_buttons:
             team_button.show()
         self.overlay.show()
@@ -452,8 +464,11 @@ class GameBoard(QWidget):
         for team_button in self.team_buttons:
             team_button.hide()
         if self.file_showcase is not None:
-            if isinstance(self.file_showcase, PlayStopButton) or isinstance(self.file_showcase, VideoPlayer):
+            if isinstance(self.file_showcase, PlayStopButton):
                 self.file_showcase.stop()
+            elif isinstance(self.file_showcase, VideoPlayer):
+                self.file_showcase.stop()
+                self.file_showcase.playButton.deleteLater()
             self.file_showcase.hide()
             self.file_showcase.deleteLater()
             self.file_showcase = None
