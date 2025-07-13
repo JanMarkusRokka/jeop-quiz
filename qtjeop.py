@@ -4,11 +4,12 @@ import json
 from PyQt5.QtWidgets import (
     QApplication, QWidget, QPushButton, QLabel,
     QVBoxLayout, QHBoxLayout, QGridLayout, QLineEdit,
-    QStackedWidget, QScrollArea, QFrame, QCheckBox
+    QStackedWidget, QScrollArea, QFrame, QCheckBox, QStyle
 )
 from PyQt5.QtGui import QFont, QIcon, QPixmap
 from PyQt5.QtCore import Qt, QUrl, QFileInfo
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
+from PyQt5.QtMultimediaWidgets import QVideoWidget
 
 font_size = 14
 image_file_extensions = ['.jpg', '.png']
@@ -72,6 +73,27 @@ class PlayStopButton(QPushButton):
     def stop(self):
         self.player.stop()
         self.setText('►')
+
+class VideoPlayer(QVideoWidget):
+    def __init__(self, player, path, parent=None):
+        super().__init__(parent)
+        self.player = player
+        self.playButton = QPushButton(self)
+        self.playButton.setIcon(self.style().standardIcon(QStyle.SP_MediaPlay))
+        self.playButton.clicked.connect(self.play)
+        if path != '':
+            self.player.setMedia(
+                    QMediaContent(QUrl.fromLocalFile(path)))
+    
+    def play(self):
+        if self.player.state() == QMediaPlayer.PlayingState:
+            self.player.pause()
+        else:
+            self.player.play()
+    
+    def stop(self):
+        if self.player.state() == QMediaPlayer.PlayingState:
+            self.player.stop()
 
 class DropLabel(QLabel):
     def __init__(self, parent=None):
@@ -406,7 +428,7 @@ class GameBoard(QWidget):
             elif extension in sound_file_extensions:
                 self.file_showcase = PlayStopButton(path, player, parent=self.overlay)
             elif extension in video_file_extensions:
-                print('video')
+                self.file_showcase = VideoPlayer(player, path, self.overlay)
 
         for team_button in self.team_buttons:
             team_button.show()
@@ -430,7 +452,7 @@ class GameBoard(QWidget):
         for team_button in self.team_buttons:
             team_button.hide()
         if self.file_showcase is not None:
-            if isinstance(self.file_showcase, PlayStopButton):
+            if isinstance(self.file_showcase, PlayStopButton) or isinstance(self.file_showcase, VideoPlayer):
                 self.file_showcase.stop()
             self.file_showcase.hide()
             self.file_showcase.deleteLater()
@@ -520,6 +542,4 @@ if __name__ == "__main__":
     window.show()
     sys.exit(app.exec_())
 
-# Add this structure for money/points   "categories": {
-#    "1": ["CategoryTitle1", [100, "Kas ja kuidas ja kas ja kuidas ja kas?"], [200, "Kes?"], [300, "Kus?"], [400, "Millal"], [500, "Milleks?"]],
 # Make buttons scale better - for later, first focus on main mechanics
