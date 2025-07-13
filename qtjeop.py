@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import (
     QVBoxLayout, QHBoxLayout, QGridLayout, QLineEdit,
     QStackedWidget, QScrollArea, QFrame, QCheckBox
 )
-from PyQt5.QtGui import QFont, QIcon
+from PyQt5.QtGui import QFont, QIcon, QPixmap
 from PyQt5.QtCore import Qt
 
 font_size = 14
@@ -183,6 +183,13 @@ class GameBoard(QWidget):
         self.play_label.setAlignment(Qt.AlignCenter)
         self.play_label.hide()
 
+        self.answer_label = QLabel(self.overlay)
+        self.answer_label.setFont(QFont("Arial", font_size))
+        self.answer_label.setStyleSheet("color: 'white'")
+        self.answer_label.setText("")
+        self.answer_label.setAlignment(Qt.AlignCenter)
+        self.answer_label.hide()
+
         self.input_field = QLineEdit(self.overlay)
         self.input_field.setFont(QFont("Arial", font_size))
         self.input_field.setFixedWidth(300)
@@ -197,27 +204,32 @@ class GameBoard(QWidget):
         self.file_drop.setAlignment(Qt.AlignCenter)
         self.file_drop.hide()
 
+        self.file_showcase = None
+
         self.edit_mode = False
         self.teams_layout = None
 
         self.auto_save = False
 
         self.current_question = None
+        self.current_image = None
         self.input_field.returnPressed.connect(self.save_edit)
         #self.play_label.keyPressEvent = self.keyPressEvent
 
     def keyPressEvent(self, event):
         if not self.edit_mode and not self.play_label.isHidden():
             if event.key() == 16777220 or event.key == Qt.Key.Key_Enter :
-                self.finish_play_field()
-                print('enter')
+                if (self.answer_label.isHidden()):
+                    self.answer_label.show()
+                else:
+                    self.finish_play_field()
 
     def resizeEvent(self, event):
         super().resizeEvent(event)
         self.overlay.setGeometry(0, 0, self.width(), self.height())
         self.center_overlay()
 
-    def center_overlay(self):
+    def center_overlay(self): # Not very efficient, since most of this stuff is not visible half the time, but it works for now
         self.input_field.move(
             (self.width() - self.input_field.width()) // 2,
             (self.height() - self.input_field.height()) // 2
@@ -228,8 +240,20 @@ class GameBoard(QWidget):
         )
         self.play_label.move(
             (self.width() - self.play_label.width()) // 2,
-            (self.height() - self.play_label.height()) // 2
+            (self.height() - self.play_label.height()) // 3
         )
+        self.answer_label.move(
+            (self.width() - self.answer_label.width()) // 2,
+            self.play_label.y() + int(self.play_label.y() * 0.2)
+        )
+        if self.current_image is not None and self.file_showcase is not None:
+            pixmap = self.current_image.scaledToHeight(self.height() // 3)
+            self.file_showcase.setPixmap(pixmap)
+            self.file_showcase.resize(pixmap.size())
+            self.file_showcase.move(
+                (self.width() - self.file_showcase.width()) // 2,
+                ((self.height() - self.file_showcase.height()) * 2) // 3
+            )
 
     def switch_autosave(self):
         self.auto_save = not self.auto_save
@@ -335,10 +359,18 @@ class GameBoard(QWidget):
         self.current_data['saved_games']['save1']['board_state'][int(index[0]) - 1][index[1]-1] = True
         self.play_label.setText(self.current_data['categories'][index[0]][index[1]][1])
         self.current_question = self.current_data['categories'][index[0]][index[1]]
+        self.answer_label.setText(self.current_data['categories'][index[0]][index[1]][3])
         # if question has a file
         if len(self.current_question[2]) > 0:
             path = self.current_question[2]
-            print(path[-4:])
+            # jpg or png image, the display it
+            if path[-4:] == '.jpg' or path[-4:] == '.png':
+                self.file_showcase = QLabel(self.overlay)
+                self.current_image = QPixmap(path)
+                pixmap = self.current_image.scaledToHeight(self.height() // 3)
+                self.file_showcase.setPixmap(pixmap)
+            # elif path[-4:] == ''
+
         for team_button in self.team_buttons:
             team_button.show()
         self.overlay.show()
@@ -354,10 +386,15 @@ class GameBoard(QWidget):
     
     def finish_play_field(self):
         self.play_label.setText('')
-        for team_button in self.team_buttons:
-            team_button.hide()
+
         if self.auto_save:
             self.save()
+        self.current_image = None
+        for team_button in self.team_buttons:
+            team_button.hide()
+        if self.file_showcase is not None:
+            self.file_showcase.hide()
+        self.answer_label.hide()
         self.overlay.hide()
         self.play_label.hide()
 
@@ -384,21 +421,18 @@ class GameBoard(QWidget):
         button = self.editing_button
         index = self.category_buttons[button]
 
+        self.input_field.hide()
+        self.overlay.hide()
         if isinstance(self.current_data["categories"][index[0]][index[1]], str):
             if not new_text or new_text == self.current_data["categories"][index[0]][index[1]]:
-                self.input_field.hide()
-                self.overlay.hide()
                 return
             button.setText(wrap_text(new_text))
             self.current_data['categories'][index[0]][index[1]] = new_text
         else:
-            if not new_text or new_text == self.current_data["categories"][index[0]][index[1]][1]:
-                self.input_field.hide()
-                self.overlay.hide()
-                self.file_drop.hide()
-                return
             self.file_drop.hide()
-            if (len(self.file_drop.text()) > 0):
+            if not new_text or new_text == self.current_data["categories"][index[0]][index[1]][1]:
+                return
+            if len(self.file_drop.text()) > 0 and self.file_drop.text() != 'Drop a file here:':
                 self.current_data["categories"][index[0]][index[1]][2] = self.file_drop.text()
             #self.file_drop.setText('')
             button.setText(str(self.current_data["categories"][index[0]][index[1]][0]) + '\n' + wrap_text(new_text))
@@ -406,8 +440,6 @@ class GameBoard(QWidget):
 
         if self.auto_save:
             self.save()
-        self.input_field.hide()
-        self.overlay.hide()
         print(self.current_data)
 
 

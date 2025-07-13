@@ -6,139 +6,164 @@
             [
                 100,
                 "Kas sadsadasds",
-                "C:/Users/JanMa/jeop/jeop-quiz/games/NewDocument/foto.jpg"
+                "C:/Users/JanMa/jeop/jeop-quiz/games/NewDocument/foto.jpg",
+                "correct answer here"
             ],
             [
                 200,
-                "Kes?",
-                ""
+                "Ke",
+                "Drop a file here:",
+                "correct answer here"
             ],
             [
                 300,
                 "Kus?",
-                ""
+                "",
+                "correct answer here"
             ],
             [
                 400,
                 "Millal",
-                ""
+                "",
+                "correct answer here"
             ],
             [
                 500,
                 "Milleks?",
-                ""
+                "",
+                "correct answer here"
             ]
         ],
         "2": [
             "Sport",
             [
                 100,
-                "Kas da as d",
-                ""
+                "Kas sadsadasds",
+                "C:/Users/JanMa/jeop/jeop-quiz/games/NewDocument/foto.jpg",
+                "correct answer here"
             ],
             [
                 200,
-                "Kes?",
-                ""
+                "Kes on j?",
+                "Drop a file here:",
+                "correct answer here"
             ],
             [
                 300,
                 "Kus?",
-                ""
+                "",
+                "correct answer here"
             ],
             [
                 400,
                 "Millal",
-                ""
+                "",
+                "correct answer here"
             ],
             [
                 500,
                 "Milleks?",
-                ""
+                "",
+                "correct answer here"
             ]
         ],
         "3": [
             "Sport",
             [
                 100,
-                "Kas da as d",
-                ""
+                "Kas sadsadasds",
+                "C:/Users/JanMa/jeop/jeop-quiz/games/NewDocument/foto.jpg",
+                "correct answer here"
             ],
             [
                 200,
-                "Kes?",
-                ""
+                "Ke",
+                "Drop a file here:",
+                "correct answer here"
             ],
             [
                 300,
                 "Kus?",
-                ""
+                "",
+                "correct answer here"
             ],
             [
                 400,
                 "Millal",
-                ""
+                "",
+                "correct answer here"
             ],
             [
                 500,
                 "Milleks?",
-                ""
+                "",
+                "correct answer here"
             ]
         ],
         "4": [
             "Sport",
             [
                 100,
-                "Kas da as d",
-                ""
+                "Kas sadsadasds",
+                "C:/Users/JanMa/jeop/jeop-quiz/games/NewDocument/foto.jpg",
+                "correct answer here"
             ],
             [
                 200,
-                "Kes?",
-                ""
+                "Ke",
+                "Drop a file here:",
+                "correct answer here"
             ],
             [
                 300,
                 "Kus?",
-                ""
+                "",
+                "correct answer here"
             ],
             [
                 400,
                 "Millal",
-                ""
+                "",
+                "correct answer here"
             ],
             [
                 500,
                 "Milleks?",
-                ""
+                "",
+                "correct answer here"
             ]
         ],
         "5": [
             "Sport",
             [
                 100,
-                "Kas da as d",
-                ""
+                "Kas sadsadasds",
+                "C:/Users/JanMa/jeop/jeop-quiz/games/NewDocument/foto.jpg",
+                "correct answer here"
             ],
             [
                 200,
-                "Kes?",
-                ""
+                "Ke",
+                "Drop a file here:",
+                "correct answer here"
             ],
             [
                 300,
                 "Kus?",
-                ""
+                "",
+                "correct answer here"
             ],
             [
                 400,
                 "Millal",
-                ""
+                "",
+                "correct answer here"
             ],
             [
                 500,
                 "Milleks?",
-                ""
+                "",
+                "correct answer here"
             ]
         ]
     },
