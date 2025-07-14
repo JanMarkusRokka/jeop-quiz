@@ -10,11 +10,15 @@ from PyQt5.QtGui import QFont, QIcon, QPixmap
 from PyQt5.QtCore import Qt, QUrl, QFileInfo
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from PyQt5.QtMultimediaWidgets import QVideoWidget
+import vlc
+import time
 
-font_size = 14
 image_file_extensions = ['.jpg', '.png']
 sound_file_extensions = ['.mp3', '.wav']
 video_file_extensions = ['.mp4', '.webm', '.wmv']
+class Config:
+    font_size = 14
+    vlc_instance = vlc.Instance()
 
 def find_games():
     games = {}
@@ -54,7 +58,7 @@ class PlayStopButton(QPushButton):
         super().__init__(parent)
         self.setText('►')
         self.setStyleSheet('color: white')
-        self.setFont(QFont('Arial', font_size + 4))
+        self.setFont(QFont('Arial', Config.font_size + 4))
         self.path = path
         self.player = player
         self.clicked.connect(self.playStop)
@@ -74,30 +78,46 @@ class PlayStopButton(QPushButton):
         self.player.stop()
         self.setText('►')
 
-class VideoPlayer(QVideoWidget):
-    def __init__(self, player, parent=None):
+class VideoPlayerButton(QPushButton):
+    def __init__(self, video_path, parent=None):
         super().__init__(parent)
-        self.player = player
-        self.playButton = QPushButton(parent)
-        self.playButton.setStyleSheet('color: white')
-        self.playButton.setIcon(self.style().standardIcon(QStyle.SP_MediaPlay))
-        self.playButton.clicked.connect(self.play)
-        self.player.setVideoOutput(self)
-        # self.player.play()
+        self.video_player = None
+        self.setText('Open video')
+        self.setFont(QFont('Arial', Config.font_size + 4))
+        self.setStyleSheet('color: white')
+        self.clicked.connect(lambda _, p=video_path: self.OpenPlayer(p))
     
-    def setPath(self, path):
-        if path != '':
-            self.player.setMedia(
-                    QMediaContent(QUrl.fromLocalFile(path)))
+    def OpenPlayer(self, path):
+        if self.video_player is not None:
+            self.video_player.close()
+        self.video_player = VideoPlayer(path)
+        self.video_player.show()
 
-    def play(self):
-        if self.player.state() == QMediaPlayer.PlayingState:
+class VideoPlayer(QWidget):
+    def __init__(self, video_path):
+        super().__init__()
+        self.setWindowTitle("Video player")
+        self.setMinimumSize(800, 600)
+
+        self.player = vlc.MediaPlayer(video_path)
+        self.hide()
+        self.player.play()
+        # use space for pause?
+    
+    def closeEvent(self, event):
+        self.player.stop()
+        self.player.release()
+        event.accept()
+
+    def toggle_play(self):
+        if self.player.is_playing():
             self.player.pause()
         else:
             self.player.play()
     
-    def stop(self):
-        self.player.stop()
+    # def keyPressEvent(self, event):
+    #     if event.key == Qt.Key.Key_Space :
+    #         self.toggle_play()
 
 class DropLabel(QLabel):
     def __init__(self, parent=None):
@@ -131,20 +151,20 @@ class GameSelector(QWidget):
         self.overlay.hide()
 
         self.select_label = QLabel(self.overlay)
-        self.select_label.setFont(QFont("Arial", font_size))
+        self.select_label.setFont(QFont("Arial", Config.font_size))
         self.select_label.setStyleSheet("color: 'white'")
         self.select_label.setText("Select mode:")
         self.select_label.setAlignment(Qt.AlignCenter)
         self.select_label.hide()
 
         self.play_button = QPushButton(self.overlay)
-        self.play_button.setFont(QFont("Arial", font_size))
+        self.play_button.setFont(QFont("Arial", Config.font_size))
         self.play_button.setStyleSheet("color: 'white'")
         self.play_button.setText("Play")
         self.play_button.hide()
 
         self.edit_button = QPushButton(self.overlay)
-        self.edit_button.setFont(QFont("Arial", font_size))
+        self.edit_button.setFont(QFont("Arial", Config.font_size))
         self.edit_button.setStyleSheet("color: 'white'")
         self.edit_button.setText("Edit")
         self.edit_button.hide()
@@ -152,19 +172,48 @@ class GameSelector(QWidget):
     def init_ui(self):
         layout = QVBoxLayout()
         label = QLabel("Select a game:")
-        label.setFont(QFont("Arial", font_size))
+        label.setFont(QFont("Arial", Config.font_size))
         layout.addWidget(label)
 
         games = find_games()
         for name, path in games.items():
             button = QPushButton(name)
-            button.setFont(QFont("Arial", font_size))
+            button.setFont(QFont("Arial", Config.font_size))
             button.clicked.connect(lambda _, p=path: self.select_mode(p))
             layout.addWidget(button)
 
         layout.addStretch()
         self.setLayout(layout)
+        layout_font_size = QHBoxLayout()
+        font_size_add = QPushButton()
+        font_size_add.setText('+ Font size')
+        font_size_add.setFont(QFont('Arial', Config.font_size))
+        font_size_add.clicked.connect(self.addFontSize)
+
+        font_size_sub = QPushButton()
+        font_size_sub.setText('- Font size')
+        font_size_sub.setFont(QFont('Arial', Config.font_size))
+        font_size_sub.clicked.connect(self.subFontSize)
+
+        layout_font_size.addWidget(font_size_add)
+        layout_font_size.addWidget(font_size_sub)
+        self.font_size_example = QLabel('Font size example')
+        self.font_size_example.setFont(QFont('Arial', Config.font_size))
+        layout_font_size.addWidget(self.font_size_example)
+        layout.addLayout(layout_font_size)
     
+    def addFontSize(self):
+        self.modifyFontSize(2)
+    
+    def subFontSize(self):
+        self.modifyFontSize(-2)
+
+    def modifyFontSize(self, amount):
+        if self.font_size_example is not None:
+            print(Config.font_size)
+            Config.font_size = Config.font_size + amount
+            self.font_size_example.setFont(QFont('Arial', Config.font_size))
+
     def hide_overlay(self):
         self.select_label.hide()
         self.play_button.hide()
@@ -235,32 +284,34 @@ class GameBoard(QWidget):
         self.overlay.hide()
 
         self.play_label = QLabel(self.overlay)
-        self.play_label.setFont(QFont("Arial", font_size))
+        self.play_label.setFont(QFont("Arial", Config.font_size))
         self.play_label.setStyleSheet("color: 'white'")
         self.play_label.setText("")
         self.play_label.setAlignment(Qt.AlignCenter)
         self.play_label.hide()
 
         self.answer_label = QLabel(self.overlay)
-        self.answer_label.setFont(QFont("Arial", font_size))
+        self.answer_label.setFont(QFont("Arial", Config.font_size))
         self.answer_label.setStyleSheet("color: 'white'")
         self.answer_label.setText("")
         self.answer_label.setAlignment(Qt.AlignCenter)
         self.answer_label.hide()
 
         self.input_field = QLineEdit(self.overlay)
-        self.input_field.setFont(QFont("Arial", font_size))
+        self.input_field.setFont(QFont("Arial", Config.font_size))
         self.input_field.setFixedWidth(300)
         self.input_field.setStyleSheet("color: 'white'")
         self.input_field.setAlignment(Qt.AlignCenter)
         self.input_field.hide()
 
         self.file_drop = DropLabel(self.overlay)
-        self.file_drop.setFont(QFont("Arial", font_size))
+        self.file_drop.setFont(QFont("Arial", Config.font_size))
         self.file_drop.setText('Drop a file here:')
         self.file_drop.setStyleSheet("QLabel { color: white; background-color: black; border: 2px dashed gray; }")
         self.file_drop.setAlignment(Qt.AlignCenter)
         self.file_drop.hide()
+        
+        self.font_update = [self.play_label, self.answer_label, self.input_field, self.file_drop]
 
         self.file_showcase = None
 
@@ -305,20 +356,20 @@ class GameBoard(QWidget):
             self.play_label.y() + int(self.play_label.y() * 0.2)
         )
         if self.file_showcase is not None:
-            if self.current_image is not None:
+            if self.current_image is not None and isinstance(self.file_showcase, QLabel):
                     pixmap = self.current_image.scaledToHeight(self.height() // 3)
                     self.file_showcase.setPixmap(pixmap)
                     self.file_showcase.resize(pixmap.size())
-            if isinstance(self.file_showcase, VideoPlayer):
-               self.file_showcase.resize(self.width() // 3, self.height() // 3)
-               self.file_showcase.playButton.move(
-                    (self.width() - self.file_showcase.playButton.width()) // 2,
-                    (self.play_label.y() - int(self.file_showcase.playButton.height() * 1.5))
-               )
-            self.file_showcase.move(
-                (self.width() - self.file_showcase.width()) // 2,
-                ((self.height() - self.file_showcase.height()) * 2) // 3
-            )
+            if isinstance(self.file_showcase, VideoPlayerButton):
+                self.file_showcase.move(
+                    (self.width() - self.file_showcase.width()) // 2,
+                    (self.play_label.y() + int(self.file_showcase.height() * 3))
+                )
+            else:
+                self.file_showcase.move(
+                    (self.width() - self.file_showcase.width()) // 2,
+                    ((self.height() - self.file_showcase.height()) * 2) // 3
+                )
 
     def switch_autosave(self):
         self.auto_save = not self.auto_save
@@ -326,6 +377,8 @@ class GameBoard(QWidget):
     def load_game(self, path, edit_mode):
         self.path = path
         self.edit_mode = edit_mode
+        for widget in self.font_update:
+            widget.setFont(QFont('Arial', Config.font_size + 2))
         # Clear previous widgets
         while self.grid.count():
             item = self.grid.takeAt(0)
@@ -345,7 +398,7 @@ class GameBoard(QWidget):
         back_btn.clicked.connect(self.return_to_menu_callback)
         self.grid.addWidget(back_btn, 0, 0)
         autosave_checkmark = QCheckBox()
-        autosave_checkmark.setText("♲")
+        autosave_checkmark.setText("♲\nautosave")
         autosave_checkmark.setFixedSize(40, 40)
         autosave_checkmark.clicked.connect(self.switch_autosave)
         self.grid.addWidget(autosave_checkmark, 1, 0)
@@ -357,7 +410,7 @@ class GameBoard(QWidget):
 
             cat_button = QPushButton(cat_title)
 
-            cat_button.setFont(QFont("Arial", font_size))
+            cat_button.setFont(QFont("Arial", Config.font_size))
             #cat_button.setFixedWidth(120)
             cat_button.setStyleSheet('text-align: center; white-space: normal;')
             if (self.edit_mode):
@@ -370,7 +423,7 @@ class GameBoard(QWidget):
             questions = self.current_data["categories"][cat_id][1:]
             for row, question in enumerate(questions, start=1):
                 q_button = QPushButton(str(question[0]))
-                q_button.setFont(QFont("Arial", font_size))
+                q_button.setFont(QFont("Arial", Config.font_size))
                 if (self.edit_mode):
                     q_button.setText(str(question[0]) + '\n' + wrap_text(question[1]))
                     q_button.clicked.connect(lambda _, b=q_button: self.edit_field(b))
@@ -392,13 +445,13 @@ class GameBoard(QWidget):
                 team_addsub_layout = QHBoxLayout()
 
                 team_button = QPushButton(team[0] + " \n " + str(team[1]))
-                team_button.setFont(QFont('Arial', font_size))
+                team_button.setFont(QFont('Arial', Config.font_size))
                 team_layout.addWidget(team_button)
 
                 team_button_add = QPushButton('+')
                 team_button_sub = QPushButton('-')
-                team_button_add.setFont(QFont('Arial', font_size))
-                team_button_sub.setFont(QFont('Arial', font_size))
+                team_button_add.setFont(QFont('Arial', Config.font_size))
+                team_button_sub.setFont(QFont('Arial', Config.font_size))
                 team_button_add.clicked.connect(lambda _, tb=team_button, id=id: self.modify_points(id, tb))
                 team_button_sub.clicked.connect(lambda _, tb=team_button, id=id: self.modify_points(id, tb, -1))
                 team_addsub_layout.addWidget(team_button_add)
@@ -438,9 +491,7 @@ class GameBoard(QWidget):
             elif extension in sound_file_extensions:
                 self.file_showcase = PlayStopButton(path, player, parent=self.overlay)
             elif extension in video_file_extensions:
-                self.file_showcase = VideoPlayer(player, self.overlay)
-                self.file_showcase.setPath(path)
-                #self.file_showcase.play()
+                self.file_showcase = VideoPlayerButton(path, self.overlay)
                 
         for team_button in self.team_buttons:
             team_button.show()
@@ -466,9 +517,9 @@ class GameBoard(QWidget):
         if self.file_showcase is not None:
             if isinstance(self.file_showcase, PlayStopButton):
                 self.file_showcase.stop()
-            elif isinstance(self.file_showcase, VideoPlayer):
-                self.file_showcase.stop()
-                self.file_showcase.playButton.deleteLater()
+            elif isinstance(self.file_showcase, VideoPlayerButton):
+                if self.file_showcase.video_player is not None:
+                    self.file_showcase.video_player.close()
             self.file_showcase.hide()
             self.file_showcase.deleteLater()
             self.file_showcase = None
@@ -503,23 +554,19 @@ class GameBoard(QWidget):
         self.input_field.hide()
         self.overlay.hide()
         if isinstance(self.current_data["categories"][index[0]][index[1]], str):
-            if not new_text or new_text == self.current_data["categories"][index[0]][index[1]]:
-                return
             button.setText(wrap_text(new_text))
             self.current_data['categories'][index[0]][index[1]] = new_text
         else:
             self.file_drop.hide()
-            if not new_text or new_text == self.current_data["categories"][index[0]][index[1]][1]:
-                return
             if len(self.file_drop.text()) > 0 and self.file_drop.text() != 'Drop a file here:':
                 self.current_data["categories"][index[0]][index[1]][2] = self.file_drop.text()
             #self.file_drop.setText('')
             button.setText(str(self.current_data["categories"][index[0]][index[1]][0]) + '\n' + wrap_text(new_text))
             self.current_data['categories'][index[0]][index[1]][1] = new_text
 
+        print(self.auto_save)
         if self.auto_save:
             self.save()
-        print(self.current_data)
 
 
 class MainWindow(QWidget):
