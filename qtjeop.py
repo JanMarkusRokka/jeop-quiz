@@ -40,9 +40,13 @@ class MainWindow(QWidget):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
+    light_mode = False
     if len(sys.argv) > 1:
-        if sys.argv[1] == 'dark':
-            app.setStyleSheet("""
+        if sys.argv[1] == 'light':
+            light_mode = True
+
+    if not light_mode:
+        app.setStyleSheet("""
                 QPushButton {
                     border-radius: 10px;
                     border : 2px solid;

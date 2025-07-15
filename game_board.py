@@ -349,7 +349,7 @@ class GameBoard(QWidget):
             ]
         self.reload_teams()
         for button in self.category_buttons.keys():
-            button.setStyleSheet("background-color: grey; color: black")
+            button.setStyleSheet("")
 
     def save(self):
         data = json.dumps(self.current_data, indent=4)
