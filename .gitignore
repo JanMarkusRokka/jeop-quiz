@@ -11,3 +11,6 @@ __pycache__/play_stop_button.cpython-313.pyc
 __pycache__/qtjeop.cpython-313.pyc
 __pycache__/video_player_button.cpython-313.pyc
 __pycache__/video_player.cpython-313.pyc
+qtjeop.spec
+dist/
+build/

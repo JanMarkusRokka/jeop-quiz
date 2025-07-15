@@ -12,11 +12,11 @@ from config import Config, delete_layout_recursive, wrap_text
 from video_player_button import VideoPlayerButton
 
 class GameBoard(QWidget):
-    def __init__(self, return_to_menu_callback):
+    def __init__(self, return_to_menu_callback, player):
         super().__init__()
         self.return_to_menu_callback = return_to_menu_callback
         self.current_data = None
-
+        self.player = player
         # Main layout
         self.layout = QVBoxLayout(self)
         self.grid_widget = QWidget()
@@ -59,7 +59,7 @@ class GameBoard(QWidget):
         self.input_field_answer.setAlignment(Qt.AlignCenter)
         self.input_field_answer.hide()
 
-        self.file_drop = DropLabel(self.overlay)
+        self.file_drop = DropLabel(self.window(), self.overlay)
         self.file_drop.setFont(QFont("Arial", Config.font_size))
         self.file_drop.setText('Drop a file here:')
         self.file_drop.setStyleSheet("QLabel { color: white; background-color: black; border: 2px dashed gray; }")
@@ -167,7 +167,8 @@ class GameBoard(QWidget):
         back_btn.clicked.connect(self.return_to_menu_callback)
         self.grid.addWidget(back_btn, 0, 0)
         autosave_checkmark = QCheckBox()
-        autosave_checkmark.setText("♲\nautosave")
+        autosave_checkmark.setText("♲\nauto")
+        autosave_checkmark.setFont(QFont('Arial', Config.font_size))
         autosave_checkmark.setFixedSize(40, 40)
         autosave_checkmark.setChecked(True)
         autosave_checkmark.clicked.connect(self.switch_autosave)
@@ -175,6 +176,7 @@ class GameBoard(QWidget):
         if not self.edit_mode:
             game_state_reset_button = QPushButton('Reset')
             game_state_reset_button.setFixedSize(60, 40)
+            game_state_reset_button.setFont(QFont('Arial', Config.font_size))
             game_state_reset_button.clicked.connect(self.reset_game_state)
             self.grid.addWidget(game_state_reset_button, 2, 0)
 
@@ -205,7 +207,7 @@ class GameBoard(QWidget):
                 else:
                     q_button.clicked.connect(lambda _, b=q_button: self.play_field(b))
                     if (self.current_data['saved_games']['save1']['board_state'][col-1][row-1]):
-                        q_button.setStyleSheet("background-color: darkgrey")
+                        q_button.setStyleSheet("background-color: grey; color: black")
                 self.grid.addWidget(q_button, row, col)
                 self.category_buttons[q_button] = (cat_id, row)
                 i = row
@@ -347,7 +349,7 @@ class GameBoard(QWidget):
             ]
         self.reload_teams()
         for button in self.category_buttons.keys():
-            button.setStyleSheet("background-color: light gray")
+            button.setStyleSheet("background-color: grey; color: black")
 
     def save(self):
         data = json.dumps(self.current_data, indent=4)
@@ -357,7 +359,7 @@ class GameBoard(QWidget):
 
     def play_field(self, button):
         index = self.category_buttons[button]
-        button.setStyleSheet("background-color: darkgrey")
+        button.setStyleSheet("background-color: grey; color: black")
         self.current_data['saved_games']['save1']['board_state'][int(index[0]) - 1][index[1]-1] = True
         self.play_label.setText(self.current_data['categories'][index[0]][index[1]][1])
         self.current_question = self.current_data['categories'][index[0]][index[1]]
@@ -373,15 +375,15 @@ class GameBoard(QWidget):
                 pixmap = self.current_image.scaledToHeight(self.height() // 3)
                 self.file_showcase.setPixmap(pixmap)
             elif extension in Config.file_extensions['sound_file_extensions']:
-                self.file_showcase = PlayStopButton(path, player, parent=self.overlay)
+                self.file_showcase = PlayStopButton(path, self.player, parent=self.overlay)
             elif extension in Config.file_extensions['video_file_extensions']:
                 self.file_showcase = VideoPlayerButton(path, self.overlay)
         self.add_button.hide()
+        self.center_overlay()
         for team_button in self.team_buttons:
             team_button.show()
         self.overlay.show()
         self.play_label.show()
-        self.center_overlay()
     
     def modify_points(self, team_id, button, multiplier=1):
         points = self.current_question[0]

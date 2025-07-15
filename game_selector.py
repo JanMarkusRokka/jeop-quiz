@@ -1,3 +1,4 @@
+import os
 from PyQt5.QtWidgets import (
     QWidget, QPushButton, QLabel,
     QVBoxLayout, QHBoxLayout, QLineEdit,
@@ -16,7 +17,7 @@ class GameSelector(QWidget):
         self.overlay = QWidget(self)
         self.overlay.setStyleSheet("background-color: rgba(0, 0, 0, 160);")
         self.overlay.hide()
-
+        
         self.select_label = QLabel(self.overlay)
         self.select_label.setFont(QFont("Arial", Config.font_size))
         self.select_label.setStyleSheet("color: 'white'")
@@ -44,7 +45,6 @@ class GameSelector(QWidget):
         self.new_file_name_input.hide()
 
     def init_ui(self):
-        # Make UI update when coming back from game
         self.boxlayout = QVBoxLayout()
         label = QLabel("Select a game:")
         label.setFont(QFont("Arial", Config.font_size))
@@ -55,7 +55,7 @@ class GameSelector(QWidget):
         self.boxlayout.addLayout(self.games_layout)
         new_game_button = QPushButton('New game')
         new_game_button.setFont(QFont('Arial', Config.font_size))
-        new_game_button.setStyleSheet('background-color: #A9A9A9; color: white')
+        new_game_button.setStyleSheet('background-color: #575862; color: white')
         new_game_button.clicked.connect(self.openNewGameOverlay)
         self.boxlayout.addWidget(new_game_button)
 

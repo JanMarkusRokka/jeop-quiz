@@ -1,24 +1,13 @@
 import sys
-import os
 from PyQt5.QtWidgets import (
     QApplication, QWidget,
     QVBoxLayout,
     QStackedWidget
 )
 from PyQt5.QtGui import QIcon
-from PyQt5.QtMultimedia import QMediaPlayer
-
 from game_board import GameBoard
 from game_selector import GameSelector
-
-class Player:
-    def __init__(self, name="", points=0):
-        super().__init__()
-        self.name = name
-        self.points = points
-
-    def setPoints(self, points):
-        self.points = points
+from PyQt5.QtMultimedia import QMediaPlayer
 
 class MainWindow(QWidget):
     def __init__(self):
@@ -26,10 +15,11 @@ class MainWindow(QWidget):
         self.setWindowTitle("Hakillak")
         self.setMinimumSize(720, 480)
         self.setWindowIcon(QIcon("hakillak.ico"))
+        self.player = QMediaPlayer()
 
         self.stack = QStackedWidget()
         self.selector = GameSelector(self.load_game)
-        self.board = GameBoard(self.show_menu)
+        self.board = GameBoard(self.show_menu, self.player)
 
         self.stack.addWidget(self.selector)
         self.stack.addWidget(self.board)
@@ -50,12 +40,32 @@ class MainWindow(QWidget):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    app.setStyleSheet("""
-        QPushButton {
-            background-color: light gray
-        }
-                      """)
-    player = QMediaPlayer()
+    if len(sys.argv) > 1:
+        if sys.argv[1] == 'dark':
+            app.setStyleSheet("""
+                QPushButton {
+                    border-radius: 10px;
+                    border : 2px solid;
+                    border-color: #575862;
+                    padding: 6px;
+                    
+                }
+                QPushButton:hover {
+                    background-color: #727173;
+                    border-radius: 12px;              
+                }
+                            
+                QPushButton:pressed {
+                    background-color: #99989A;
+                    border-radius: 12px;              
+                }
+                            
+                QWidget {
+                    background-color: #302F32;
+                    color: white;
+                }
+                            """)
+
     window = MainWindow()
     window.show()
     sys.exit(app.exec_())
