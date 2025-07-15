@@ -3,3 +3,11 @@ games/NewDocument/death.wmv
 videoplayer.py
 .idea/vcs.xml
 games/NewDocument/wing.mp4
+__pycache__/config.cpython-313.pyc
+__pycache__/drop_label.cpython-313.pyc
+__pycache__/game_board.cpython-313.pyc
+__pycache__/game_selector.cpython-313.pyc
+__pycache__/play_stop_button.cpython-313.pyc
+__pycache__/qtjeop.cpython-313.pyc
+__pycache__/video_player_button.cpython-313.pyc
+__pycache__/video_player.cpython-313.pyc
