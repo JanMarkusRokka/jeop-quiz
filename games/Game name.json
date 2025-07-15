@@ -1,167 +1,167 @@
 {
-    "title": "testname",
+    "title": "template",
     "categories": {
         "1": [
-            "Sport",
+            "Category1",
             [
                 100,
-                "Kas sadsadasd",
-                "C:/Users/JanMa/Downloads/DSC_0175.jpg",
+                "Question1",
+                "",
                 "correct answer here"
             ],
             [
                 200,
-                "Ke",
+                "Question2",
                 "Drop a file here:",
                 "correct answer here"
             ],
             [
                 300,
-                "Kus?",
+                "Question3?",
                 "",
                 "correct answer here"
             ],
             [
                 400,
-                "Millal",
+                "Question4",
                 "",
                 "correct answer here"
             ],
             [
                 500,
-                "Milleks?",
+                "Question5?",
                 "",
                 "correct answer here"
             ]
         ],
         "2": [
-            "Sport",
+            "Category2",
             [
                 100,
-                "Kassssss",
-                "C:/Users/JanMa/Desktop/scripts/hakillak/games/NewDocument/wing.mp4",
+                "Question1",
+                "",
                 "correct answer here"
             ],
             [
                 200,
-                "Kes on j?",
+                "Question2",
                 "Drop a file here:",
                 "correct answer here"
             ],
             [
                 300,
-                "Kus?",
+                "Question3?",
                 "",
                 "correct answer here"
             ],
             [
                 400,
-                "Millal",
+                "Question4",
                 "",
                 "correct answer here"
             ],
             [
                 500,
-                "Milleks?",
+                "Question5?",
                 "",
                 "correct answer here"
             ]
         ],
         "3": [
-            "Sport",
+            "Category3",
             [
                 100,
-                "Mis muusika see on?",
-                "C:/Users/JanMa/Downloads/The Real Slim Shady (Instrumental).mp3",
+                "Question1",
+                "",
                 "correct answer here"
             ],
             [
                 200,
-                "Ke",
+                "Question2",
                 "Drop a file here:",
                 "correct answer here"
             ],
             [
                 300,
-                "Kus?",
+                "Question3?",
                 "",
                 "correct answer here"
             ],
             [
                 400,
-                "Millal",
+                "Question4",
                 "",
                 "correct answer here"
             ],
             [
                 500,
-                "Milleks?",
+                "Question5?",
                 "",
                 "correct answer here"
             ]
         ],
         "4": [
-            "Sport",
+            "Category4",
             [
                 100,
-                "Kas sadsadasds",
-                "C:/Users/JanMa/jeop/jeop-quiz/games/NewDocument/foto.jpg",
+                "Question1",
+                "",
                 "correct answer here"
             ],
             [
                 200,
-                "Kes",
+                "Question2",
                 "Drop a file here:",
                 "correct answer here"
             ],
             [
                 300,
-                "Kus?",
+                "Question3?",
                 "",
                 "correct answer here"
             ],
             [
                 400,
-                "Millal",
+                "Question4",
                 "",
                 "correct answer here"
             ],
             [
                 500,
-                "Milleks?",
+                "Question5?",
                 "",
                 "correct answer here"
             ]
         ],
         "5": [
-            "Sport",
+            "Category5",
             [
                 100,
-                "Kas sadsadasds",
-                "C:/Users/JanMa/jeop/jeop-quiz/games/NewDocument/foto.jpg",
+                "Question1",
+                "",
                 "correct answer here"
             ],
             [
                 200,
-                "Ke",
+                "Question2",
                 "Drop a file here:",
                 "correct answer here"
             ],
             [
                 300,
-                "Kus?",
+                "Question3?",
                 "",
                 "correct answer here"
             ],
             [
                 400,
-                "Millal",
+                "Question4",
                 "",
                 "correct answer here"
             ],
             [
                 500,
-                "Milleks?",
+                "Question5?",
                 "",
                 "correct answer here"
             ]
@@ -171,59 +171,42 @@
         "save1": {
             "board_state": [
                 [
-                    true,
-                    true,
-                    true,
-                    true,
-                    true
-                ],
-                [
-                    true,
-                    true,
-                    true,
                     false,
-                    false
-                ],
-                [
-                    true,
-                    true,
-                    true,
                     false,
-                    false
-                ],
-                [
-                    true,
-                    true,
                     false,
                     false,
                     false
                 ],
                 [
-                    true,
-                    true,
-                    true,
-                    true,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false
+                ],
+                [
+                    false,
+                    false,
+                    false,
+                    false,
+                    false
+                ],
+                [
+                    false,
+                    false,
+                    false,
+                    false,
+                    false
+                ],
+                [
+                    false,
+                    false,
+                    false,
+                    false,
                     false
                 ]
             ],
-            "teams": [
-                [
-                    "EPic pepol",
-                    2800
-                ],
-                [
-                    "Bruddas",
-                    1300
-                ],
-                [
-                    "ayy lmao",
-                    1600
-                ],
-                [
-                    "tiim4",
-                    0
-                ]
-            ]
+            "teams": []
         }
     }
 }
