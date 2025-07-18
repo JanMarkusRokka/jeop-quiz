@@ -39,6 +39,14 @@ def delete_layout_recursive(layout):
                 #child.widget().deleteLater()
             elif child.layout() is not None:
                 delete_layout_recursive(child.layout())
-        parent = layout.parent
-        if isinstance(parent, QWidget):
-            parent.setLayout(None)
+        layout.setParent(None)
+
+def clear_layout_recursive(layout):
+    if layout is not None:
+        while layout.count():
+            child = layout.takeAt(0)
+            if child.widget() is not None:
+                child.widget().setParent(None)
+                #child.widget().deleteLater()
+            elif child.layout() is not None:
+                delete_layout_recursive(child.layout())

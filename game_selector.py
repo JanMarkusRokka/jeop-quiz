@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import (
 )
 from PyQt5.QtGui import QFont
 from PyQt5.QtCore import Qt
-from config import Config, delete_layout_recursive, find_games
+from config import Config, find_games, clear_layout_recursive
 
 class GameSelector(QWidget):
     def __init__(self, load_game_callback):
@@ -81,7 +81,7 @@ class GameSelector(QWidget):
         self.boxlayout.addLayout(layout_font_size)
 
     def update_games(self):
-        delete_layout_recursive(self.games_layout)
+        clear_layout_recursive(self.games_layout)
         games = find_games()
         for name, path in games.items():
             button = QPushButton(name)
