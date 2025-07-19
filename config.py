@@ -16,6 +16,12 @@ def find_games():
             games[file[:-5]] = os.path.join('./games/', file)
     return games
 
+def is_int_string(s):
+    try:
+        int(s)
+        return True
+    except ValueError:
+        return False
 
 def wrap_text(text, max_line_length=15):
     words = text.split()

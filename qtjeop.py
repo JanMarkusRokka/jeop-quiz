@@ -39,7 +39,7 @@ class MainWindow(QWidget):
     
     def go_to_game(self):
         self.stack.setCurrentWidget(self.board)
-        self.board.resizeImages()
+        self.board.resize_images()
 
     def show_menu(self):
         self.selector.update_games()

@@ -6,32 +6,37 @@
             [
                 100,
                 "Question1",
-                "",
-                "correct answer here"
+                [],
+                "correct answer here",
+                []
             ],
             [
                 200,
                 "Question2",
-                "Drop a file here:",
-                "correct answer here"
+                [],
+                "correct answer here",
+                []
             ],
             [
                 300,
                 "Question3?",
-                "",
-                "correct answer here"
+                [],
+                "correct answer here",
+                []
             ],
             [
                 400,
                 "Question4",
-                "",
-                "correct answer here"
+                [],
+                "correct answer here",
+                []
             ],
             [
                 500,
                 "Question5?",
-                "",
-                "correct answer here"
+                [],
+                "correct answer here",
+                []
             ]
         ],
         "2": [
@@ -39,32 +44,37 @@
             [
                 100,
                 "Question1",
-                "",
-                "correct answer here"
+                [],
+                "correct answer here",
+                []
             ],
             [
                 200,
                 "Question2",
-                "Drop a file here:",
-                "correct answer here"
+                [],
+                "correct answer here",
+                []
             ],
             [
                 300,
                 "Question3?",
-                "",
-                "correct answer here"
+                [],
+                "correct answer here",
+                []
             ],
             [
                 400,
                 "Question4",
-                "",
-                "correct answer here"
+                [],
+                "correct answer here",
+                []
             ],
             [
                 500,
                 "Question5?",
-                "",
-                "correct answer here"
+                [],
+                "correct answer here",
+                []
             ]
         ],
         "3": [
@@ -72,32 +82,37 @@
             [
                 100,
                 "Question1",
-                "",
-                "correct answer here"
+                [],
+                "correct answer here",
+                []
             ],
             [
                 200,
                 "Question2",
-                "Drop a file here:",
-                "correct answer here"
+                [],
+                "correct answer here",
+                []
             ],
             [
                 300,
                 "Question3?",
-                "",
-                "correct answer here"
+                [],
+                "correct answer here",
+                []
             ],
             [
                 400,
                 "Question4",
-                "",
-                "correct answer here"
+                [],
+                "correct answer here",
+                []
             ],
             [
                 500,
                 "Question5?",
-                "",
-                "correct answer here"
+                [],
+                "correct answer here",
+                []
             ]
         ],
         "4": [
@@ -105,32 +120,37 @@
             [
                 100,
                 "Question1",
-                "",
-                "correct answer here"
+                [],
+                "correct answer here",
+                []
             ],
             [
                 200,
                 "Question2",
-                "Drop a file here:",
-                "correct answer here"
+                [],
+                "correct answer here",
+                []
             ],
             [
                 300,
                 "Question3?",
-                "",
-                "correct answer here"
+                [],
+                "correct answer here",
+                []
             ],
             [
                 400,
                 "Question4",
-                "",
-                "correct answer here"
+                [],
+                "correct answer here",
+                []
             ],
             [
                 500,
                 "Question5?",
-                "",
-                "correct answer here"
+                [],
+                "correct answer here",
+                []
             ]
         ],
         "5": [
@@ -138,32 +158,37 @@
             [
                 100,
                 "Question1",
-                "",
-                "correct answer here"
+                [],
+                "correct answer here",
+                []
             ],
             [
                 200,
                 "Question2",
-                "Drop a file here:",
-                "correct answer here"
+                [],
+                "correct answer here",
+                []
             ],
             [
                 300,
                 "Question3?",
-                "",
-                "correct answer here"
+                [],
+                "correct answer here",
+                []
             ],
             [
                 400,
                 "Question4",
-                "",
-                "correct answer here"
+                [],
+                "correct answer here",
+                []
             ],
             [
                 500,
                 "Question5?",
-                "",
-                "correct answer here"
+                [],
+                "correct answer here",
+                []
             ]
         ]
     },

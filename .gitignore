@@ -14,3 +14,5 @@ __pycache__/video_player.cpython-313.pyc
 qtjeop.spec
 dist/
 build/
+games/
+*.pyc

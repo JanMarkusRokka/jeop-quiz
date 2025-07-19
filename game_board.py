@@ -1,17 +1,17 @@
 import json
 from PyQt5.QtWidgets import (
     QWidget, QPushButton, QLabel,
-    QVBoxLayout, QHBoxLayout, QGridLayout, QTextEdit,
+    QVBoxLayout, QHBoxLayout, QGridLayout, QLineEdit,
     QCheckBox
 )
 from PyQt5.QtGui import QFont, QPixmap
 from PyQt5.QtCore import Qt
 from drop_label import DropLabel
 from play_stop_button import PlayStopButton
-from config import Config, wrap_text, clear_layout_recursive
+from config import Config, wrap_text, clear_layout_recursive, is_int_string
 from video_player_button import VideoPlayerButton
-from image_display import ImageDisplay
 from clickable_label import ClickableImage
+from custom_text_edit import CustomTextEdit
 
 class GameBoard(QWidget):
     def __init__(self, return_to_menu_callback, show_image_callback, player):
@@ -46,12 +46,16 @@ class GameBoard(QWidget):
 
     def keyPressEvent(self, event):
         if event.key() == 16777220 or event.key() == Qt.Key.Key_Enter:
-            if not self.overlay.isHidden() and not self.edit_mode:
+            if not self.edit_mode and not self.play_label.isHidden():
                 if (self.answer_label.isHidden()):
                     self.answer_label.show()
+                    for i in range(self.file_showcase_answer.count()):
+                        widget = self.file_showcase_answer.itemAt(i).widget()
+                        if widget is not None:
+                            widget.show()
+                    self.resize_images()
                 else:
                     self.finish_play_field()
-                    
 
     def resizeEvent(self, event):
         super().resizeEvent(event)
@@ -60,7 +64,7 @@ class GameBoard(QWidget):
             if self.teams_layout is not None:
                 self.overlay_layout.setContentsMargins(0, 0, 0, self.teams_layout.geometry().height())
             if not self.overlay.isHidden():
-                self.resizeImages()
+                self.resize_images()
 
     def switch_autosave(self):
         self.auto_save = not self.auto_save
@@ -89,9 +93,8 @@ class GameBoard(QWidget):
         back_btn.clicked.connect(self.return_to_menu_callback)
         self.grid.addWidget(back_btn, 0, 0)
         autosave_checkmark = QCheckBox()
-        autosave_checkmark.setText("♲\nauto")
+        autosave_checkmark.setText("auto\nsave")
         autosave_checkmark.setFont(QFont('Arial', Config.font_size))
-        autosave_checkmark.setFixedSize(40, 40)
         autosave_checkmark.setChecked(True)
         autosave_checkmark.clicked.connect(self.switch_autosave)
         self.grid.addWidget(autosave_checkmark, 1, 0)
@@ -128,12 +131,6 @@ class GameBoard(QWidget):
                 self.category_buttons[q_button] = (cat_id, row)
                 i = row
 
-        self.input_field = QTextEdit()
-        self.input_field.setFont(QFont("Arial", Config.font_size))
-        self.input_field.setStyleSheet("color: 'white'")
-        self.input_field.setAlignment(Qt.AlignCenter)
-        self.input_field.hide()
-
         self.save_button = QPushButton()
         self.save_button.setFont(QFont("Arial", Config.font_size))
         self.save_button.setText('Save')
@@ -142,30 +139,51 @@ class GameBoard(QWidget):
 
         if self.edit_mode:
             inputs_layout = QHBoxLayout()
+            question_inputs_layout = QVBoxLayout()
+            answer_inputs_layout = QVBoxLayout()
             self.overlay_layout.addLayout(inputs_layout)
+            inputs_layout.addLayout(question_inputs_layout)
+            inputs_layout.addLayout(answer_inputs_layout)
 
-            inputs_layout.addWidget(self.input_field)
+            self.input_field = CustomTextEdit(self.save_edit)
+            self.input_field.setFont(QFont("Arial", Config.font_size))
+            self.input_field.setStyleSheet("color: 'white'")
+            self.input_field.setAlignment(Qt.AlignCenter)
+            self.input_field.hide()
+            question_inputs_layout.addWidget(self.input_field)
 
-            self.input_field_answer = QTextEdit()
+            self.input_field_answer = CustomTextEdit(self.save_edit)
             self.input_field_answer.setFont(QFont("Arial", Config.font_size))
             self.input_field_answer.setStyleSheet("color: 'white'")
             self.input_field_answer.setAlignment(Qt.AlignCenter)
             self.input_field_answer.hide()
-            inputs_layout.addWidget(self.input_field_answer)
+            answer_inputs_layout.addWidget(self.input_field_answer)
 
-            self.file_drop = DropLabel(self.window(), self.overlay)
+            self.file_drop_files = QVBoxLayout()
+            self.file_drop = DropLabel(self.window(), self.add_file_path, self.file_drop_files, self.overlay)
             self.file_drop.setFont(QFont("Arial", Config.font_size))
             self.file_drop.setText('Drop a file here:')
             self.file_drop.setStyleSheet("QLabel { color: white; background-color: black; border: 2px dashed gray; }")
             self.file_drop.setAlignment(Qt.AlignCenter)
             self.file_drop.hide()
-            self.overlay_layout.addWidget(self.file_drop)
+            question_inputs_layout.addWidget(self.file_drop)
+            question_inputs_layout.addLayout(self.file_drop_files)
+
+            self.file_drop_files_answer = QVBoxLayout()
+            self.file_drop_answer = DropLabel(self.window(), self.add_file_path, self.file_drop_files_answer, self.overlay)
+            self.file_drop_answer.setFont(QFont("Arial", Config.font_size))
+            self.file_drop_answer.setText('Drop a file here:')
+            self.file_drop_answer.setStyleSheet("QLabel { color: white; background-color: black; border: 2px dashed gray; }")
+            self.file_drop_answer.setAlignment(Qt.AlignCenter)
+            self.file_drop_answer.hide()
+            answer_inputs_layout.addWidget(self.file_drop_answer)
+            answer_inputs_layout.addLayout(self.file_drop_files_answer)
+
             self.overlay_layout.addWidget(self.save_button)
             self.save_button.clicked.connect(self.save_edit)
             self.overlay_layout.setContentsMargins(0, 0, 0, 0)
         else:
             game_state_reset_button = QPushButton('Reset')
-            game_state_reset_button.setFixedSize(60, 40)
             game_state_reset_button.setFont(QFont('Arial', Config.font_size))
             game_state_reset_button.clicked.connect(self.reset_game_state)
             self.grid.addWidget(game_state_reset_button, 2, 0)
@@ -180,6 +198,9 @@ class GameBoard(QWidget):
             self.play_label.hide()
             self.overlay_layout.addWidget(self.play_label)
 
+            self.file_showcase = QHBoxLayout()
+            self.overlay_layout.addLayout(self.file_showcase)
+
             self.answer_label = QLabel()
             self.answer_label.setFont(QFont("Arial", Config.font_size))
             self.answer_label.setStyleSheet("color: 'white'")
@@ -188,13 +209,24 @@ class GameBoard(QWidget):
             self.answer_label.hide()
             self.overlay_layout.addWidget(self.answer_label)
 
-            self.file_showcase = QHBoxLayout()
-            self.overlay_layout.addLayout(self.file_showcase)
+            self.file_showcase_answer = QHBoxLayout()
+            self.overlay_layout.addLayout(self.file_showcase_answer)
 
             self.team_buttons = []
             self.teams_layout = QHBoxLayout()
-
+            self.input_field = QLineEdit()
+            self.input_field.setFont(QFont("Arial", Config.font_size))
+            self.input_field.setStyleSheet("color: 'white'")
+            self.input_field.setAlignment(Qt.AlignCenter)
+            self.input_field.hide()
             self.overlay_layout.addWidget(self.input_field)
+
+            self.points_input = QLineEdit()
+            self.points_input.setFont(QFont("Arial", Config.font_size))
+            self.points_input.setText("")
+            self.points_input.setAlignment(Qt.AlignCenter)
+            self.points_input.hide()
+            self.overlay_layout.addWidget(self.points_input)
 
             self.remove_button = QPushButton()
             self.remove_button.setFont(QFont("Arial", Config.font_size))
@@ -208,6 +240,11 @@ class GameBoard(QWidget):
             #team_grid.setSpacing(10)
             self.populate_team_buttons()
             self.layout.addLayout(self.teams_layout)
+
+    def add_file_path(self, path, layout):
+        button = QPushButton(path)
+        button.clicked.connect(button.deleteLater)
+        layout.addWidget(button)
 
     def populate_team_buttons(self):
         #self.team_edit_buttons = []
@@ -247,14 +284,17 @@ class GameBoard(QWidget):
             self.input_field.setText(self.current_data['saved_games']['save1']['teams'][id][0])
             self.input_field.show()
             self.input_field.setFocus()
+            self.points_input.setText(str(self.current_data['saved_games']['save1']['teams'][id][1]))
+            self.points_input.show()
             self.editing_button = button
             self.remove_button.show()
             self.save_button.show()
             self.remove_button.clicked.connect(lambda _, t_id=id: self.remove_team(t_id))
             self.save_button.clicked.connect(lambda *_, t_id=id, t_button=button: self.finish_edit_team(t_id, t_button))
+            self.input_field.returnPressed.connect(lambda *_, t_id=id, t_button=button: self.finish_edit_team(t_id, t_button))
+            self.points_input.returnPressed.connect(lambda *_, t_id=id, t_button=button: self.finish_edit_team(t_id, t_button))
     
     def remove_team(self, id):
-
         del self.current_data['saved_games']['save1']['teams'][id]
         if self.auto_save:
             self.save()
@@ -264,21 +304,31 @@ class GameBoard(QWidget):
         self.save_button.hide()
         self.overlay.hide()
         self.input_field.setText('')
+        self.input_field.returnPressed.disconnect()
         self.input_field.hide()
+        self.points_input.setText('')
+        self.points_input.returnPressed.disconnect()
+        self.points_input.hide()
         self.reload_teams()
 
     def finish_edit_team(self, id, button):
-        button.setText(self.input_field.toPlainText() + '\n' + str(self.current_data['saved_games']['save1']['teams'][id][1]))
-        self.current_data['saved_games']['save1']['teams'][id][0] = self.input_field.toPlainText()
-        if (self.auto_save):
-            self.save()
-        self.remove_button.clicked.disconnect()
-        self.remove_button.hide()
-        self.save_button.clicked.disconnect()
-        self.save_button.hide()
-        self.overlay.hide()
-        self.input_field.setText('')
-        self.input_field.hide()
+        if is_int_string(self.points_input.text()):
+            button.setText(self.input_field.text() + '\n' + self.points_input.text().strip())
+            self.current_data['saved_games']['save1']['teams'][id][0] = self.input_field.text()
+            self.current_data['saved_games']['save1']['teams'][id][1] = int(self.points_input.text())
+            if (self.auto_save):
+                self.save()
+            self.remove_button.clicked.disconnect()
+            self.remove_button.hide()
+            self.save_button.clicked.disconnect()
+            self.save_button.hide()
+            self.overlay.hide()
+            self.input_field.setText('')
+            self.input_field.returnPressed.disconnect()
+            self.input_field.hide()
+            self.points_input.setText('')
+            self.points_input.returnPressed.disconnect()
+            self.points_input.hide()
     
     def add_team(self):
         if len(self.current_data['saved_games']['save1']['teams']) < 8:
@@ -345,6 +395,26 @@ class GameBoard(QWidget):
         with open(self.path, 'w', encoding='utf-8') as f:
             f.write(data)
 
+    def add_file_display(self, path, layout):
+        extension = path[-4:]
+        # jpg or png image, the display it
+        if extension in Config.file_extensions['image_file_extensions']:
+            image = QPixmap(path)
+            clickable_img = ClickableImage(image, self.overlay)
+            clickable_img.clicked.connect(lambda *_, pm=image: self.show_image_callback(pm))
+            clickable_img.setAlignment(Qt.AlignCenter)
+            layout.addWidget(clickable_img)
+            self.resizable_images.append(clickable_img)
+            return clickable_img
+        elif extension in Config.file_extensions['sound_file_extensions']:
+            button = PlayStopButton(path, self.player, parent=self.overlay)
+            layout.addWidget(button)
+            return button
+        elif extension in Config.file_extensions['video_file_extensions']:
+            button = VideoPlayerButton(path, self.overlay)
+            layout.addWidget(button)
+            return button
+        return None
 
     def play_field(self, button):
         index = self.category_buttons[button]
@@ -357,29 +427,22 @@ class GameBoard(QWidget):
         if len(self.current_question[2]) > 0:
             for file in self.current_question[2]:
                 path = file
-                extension = path[-4:]
-                # jpg or png image, the display it
-                if extension in Config.file_extensions['image_file_extensions']:
-                    image = QPixmap(path)
-                    clickable_img = ClickableImage(image, self.overlay)
-                    clickable_img.clicked.connect(lambda *_, pm=image: self.show_image_callback(pm))
-                    clickable_img.setAlignment(Qt.AlignCenter)
-                    self.file_showcase.addWidget(clickable_img)
-                    self.resizable_images.append(clickable_img)
-                elif extension in Config.file_extensions['sound_file_extensions']:
-                    self.file_showcase.addWidget(PlayStopButton(path, self.player, parent=self.overlay))
-                elif extension in Config.file_extensions['video_file_extensions']:
-                    self.file_showcase.addWidget(VideoPlayerButton(path, self.overlay))
+                self.add_file_display(path, self.file_showcase)
+            for file in self.current_question[4]:
+                path = file
+                display = self.add_file_display(path, self.file_showcase_answer)
+                if display is not None:
+                    display.hide()
         self.add_button.hide()
         for team_button in self.team_buttons:
             team_button.show()
         self.overlay.show()
         self.play_label.show()
         self.overlay_layout.setContentsMargins(0, 0, 0, self.teams_layout.geometry().height())
-        self.resizeImages()
+        self.resize_images()
 
     
-    def resizeImages(self):
+    def resize_images(self):
         for image in self.resizable_images:
             image.fitImage()
 
@@ -389,6 +452,15 @@ class GameBoard(QWidget):
         team = self.current_data['saved_games']['save1']['teams'][team_id]
         button.setText(team[0] + " \n " + str(team[1]))
     
+    def stop_file_showcase(self, layout):
+        for i in range(layout.count()):
+            widget = layout.itemAt(i).widget()
+            if isinstance(widget, PlayStopButton):
+                widget.stop()
+            elif isinstance(widget, VideoPlayerButton):
+                if widget.video_player is not None:
+                    widget.video_player.close()
+
     def finish_play_field(self):
         self.play_label.setText('')
 
@@ -396,17 +468,13 @@ class GameBoard(QWidget):
             self.save()
         for team_button in self.team_buttons:
             team_button.hide()
-        for i in range(self.file_showcase.count()):
-            print(i)
-            widget = self.file_showcase.itemAt(i)
-            if isinstance(widget, PlayStopButton):
-                widget.stop()
-            elif isinstance(self.file_showcase, VideoPlayerButton):
-                if widget.video_player is not None:
-                    widget.video_player.close()
+        self.stop_file_showcase(self.file_showcase)
+        self.stop_file_showcase(self.file_showcase_answer)
+        
 
         self.add_button.show()
         clear_layout_recursive(self.file_showcase)
+        clear_layout_recursive(self.file_showcase_answer)
         self.resizable_images = []
 
         self.answer_label.hide()
@@ -421,6 +489,11 @@ class GameBoard(QWidget):
         else: # Questions
             self.input_field.setText(changeable[1])
             self.file_drop.show()
+            self.file_drop_answer.show()
+            for path in changeable[2]:
+                self.add_file_path(path, self.file_drop_files)
+            for path in changeable[4]:
+                self.add_file_path(path, self.file_drop_files_answer)
             self.input_field_answer.show()
             if len(changeable[3]) > 0:
                 self.input_field_answer.setText(changeable[3])
@@ -448,11 +521,25 @@ class GameBoard(QWidget):
             self.current_data['categories'][index[0]][index[1]] = new_text
         else: # Questions
             self.file_drop.hide()
-            # add file paths saving here
+            self.file_drop_answer.hide()
+            files_question = []
+            files_answers = []
+            for i in range(self.file_drop_files.count()):
+                widget = self.file_drop_files.itemAt(i).widget()
+                if isinstance(widget, QPushButton):
+                    files_question.append(widget.text())
+            for i in range(self.file_drop_files_answer.count()):
+                widget = self.file_drop_files_answer.itemAt(i).widget()
+                if isinstance(widget, QPushButton):
+                    files_answers.append(widget.text())
+            self.current_data['categories'][index[0]][index[1]][2] = files_question
+            self.current_data['categories'][index[0]][index[1]][4] = files_answers
             button.setText(str(self.current_data["categories"][index[0]][index[1]][0]) + '\n' + wrap_text(new_text))
             self.current_data['categories'][index[0]][index[1]][1] = new_text
             if len(self.input_field_answer.toPlainText()) > 0 and self.input_field_answer.toPlainText() != 'Insert correct answer here':
                 self.current_data['categories'][index[0]][index[1]][3] = self.input_field_answer.toPlainText()
+            clear_layout_recursive(self.file_drop_files)
+            clear_layout_recursive(self.file_drop_files_answer)
 
         if self.auto_save:
             self.save()

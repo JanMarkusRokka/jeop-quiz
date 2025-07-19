@@ -1,9 +1,11 @@
 from PyQt5.QtWidgets import QLabel
 
 class DropLabel(QLabel):
-    def __init__(self, window, parent=None):
+    def __init__(self, window, func_callback, files_layout, parent=None):
         super().__init__(parent)
         self.setAcceptDrops(True)
+        self.func_callback = func_callback
+        self.files_layout = files_layout
         self.parent_window = window
 
     def dragEnterEvent(self, event):
@@ -19,7 +21,7 @@ class DropLabel(QLabel):
             for url in event.mimeData().urls():
                 file_path = url.toLocalFile()
                 if file_path:  # Ensure it's a local file
-                    self.setText(file_path)
+                    self.func_callback(file_path, self.files_layout)
                     self.parent_window.activateWindow()
                     self.parent_window.raise_()
             event.acceptProposedAction()

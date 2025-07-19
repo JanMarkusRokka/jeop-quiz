@@ -3,88 +3,67 @@
     "categories": {
         "1": [
             "Category1",
-            [
+                        [
                 100,
-                "See on pikk k\u00fcsimus See on pikk k\u00fcsimus See on pikk k\u00fcsimus See on pikk k\u00fcsimus See on pikk k\u00fcsimus See on pikk k\u00fcsimus See on pikk k\u00fcsimus See on pikk k\u00fcsimus See on pikk k\u00fcsimus See on pikk k\u00fcsimus See on pikk k\u00fcsimus See on pikk k\u00fcsimus ",
-                [
-                    "C:/Users/JanMa/Desktop/hakillak/games/chikin.png",
-                    "C:/Users/JanMa/Downloads/164481f126259b210491a9c2b7843f56.png"
-                ],
+                "Question1",
+                "insert_valid_path_here",
                 "correct answer here"
             ],
             [
                 200,
                 "Question2",
-                [
-                    "Drop a file here:"
-                ],
+                "Drop a file here:",
                 "correct answer here"
             ],
             [
                 300,
                 "Question3?",
-                [
-                    ""
-                ],
+                "",
                 "correct answer here"
             ],
             [
                 400,
                 "Question4",
-                [
-                    ""
-                ],
+                "",
                 "correct answer here"
             ],
             [
                 500,
                 "Question5?",
-                [
-                    ""
-                ],
+                "",
                 "correct answer here"
             ]
         ],
         "2": [
             "Category2",
-            [
+                        [
                 100,
-                "a wdw aw  daw dawd awd aw dawd awd",
-                [
-                    "C:/Users/JanMa/Downloads/164481f126259b210491a9c2b7843f56.png"
-                ],
+                "Question1",
+                "insert_valid_path_here",
                 "correct answer here"
             ],
             [
                 200,
                 "Question2",
-                [
-                    "Drop a file here:"
-                ],
+                "Drop a file here:",
                 "correct answer here"
             ],
             [
                 300,
                 "Question3?",
-                [
-                    ""
-                ],
+                "",
                 "correct answer here"
             ],
             [
                 400,
                 "Question4",
-                [
-                    ""
-                ],
+                "",
                 "correct answer here"
             ],
             [
                 500,
                 "Question5?",
-                [
-                    ""
-                ],
+                "",
                 "correct answer here"
             ]
         ],
@@ -93,41 +72,31 @@
             [
                 100,
                 "Question1",
-                [
-                    "C:/Users/JanMa/Downloads/pngegg (1).png"
-                ],
-                "sini on vastusssada soidjawoijd aw daiwjd oajw "
+                "insert_valid_path_here",
+                "correct answer here"
             ],
             [
                 200,
                 "Question2",
-                [
-                    "Drop a file here:"
-                ],
+                "Drop a file here:",
                 "correct answer here"
             ],
             [
                 300,
                 "Question3?",
-                [
-                    ""
-                ],
+                "",
                 "correct answer here"
             ],
             [
                 400,
                 "Question4",
-                [
-                    ""
-                ],
+                "",
                 "correct answer here"
             ],
             [
                 500,
                 "Question5?",
-                [
-                    ""
-                ],
+                "",
                 "correct answer here"
             ]
         ],
@@ -136,41 +105,31 @@
             [
                 100,
                 "Question1",
-                [
-                    "C:/Users/JanMa/Downloads/pngegg (1).png"
-                ],
-                "sini on vastusssada soidjawoijd aw daiwjd oajw "
+                "insert_valid_path_here",
+                "correct answer here"
             ],
             [
                 200,
                 "Question2",
-                [
-                    "Drop a file here:"
-                ],
+                "Drop a file here:",
                 "correct answer here"
             ],
             [
                 300,
                 "Question3?",
-                [
-                    ""
-                ],
+                "",
                 "correct answer here"
             ],
             [
                 400,
                 "Question4",
-                [
-                    ""
-                ],
+                "",
                 "correct answer here"
             ],
             [
                 500,
                 "Question5?",
-                [
-                    ""
-                ],
+                "",
                 "correct answer here"
             ]
         ],
@@ -179,41 +138,31 @@
             [
                 100,
                 "Question1",
-                [
-                    "C:/Users/JanMa/Downloads/pngegg (1).png"
-                ],
-                "sini on vastusssada soidjawoijd aw daiwjd oajw "
+                "insert_valid_path_here",
+                "correct answer here"
             ],
             [
                 200,
                 "Question2",
-                [
-                    "Drop a file here:"
-                ],
+                "Drop a file here:",
                 "correct answer here"
             ],
             [
                 300,
                 "Question3?",
-                [
-                    ""
-                ],
+                "",
                 "correct answer here"
             ],
             [
                 400,
                 "Question4",
-                [
-                    ""
-                ],
+                "",
                 "correct answer here"
             ],
             [
                 500,
                 "Question5?",
-                [
-                    ""
-                ],
+                "",
                 "correct answer here"
             ]
         ]
@@ -222,7 +171,7 @@
         "save1": {
             "board_state": [
                 [
-                    true,
+                    false,
                     false,
                     false,
                     false,
@@ -259,31 +208,7 @@
             ],
             "teams": [
                 [
-                    "Team 2",
-                    0
-                ],
-                [
-                    "Team 3",
-                    0
-                ],
-                [
-                    "Team 4",
-                    0
-                ],
-                [
-                    "Team 5",
-                    0
-                ],
-                [
-                    "Team 6",
-                    0
-                ],
-                [
-                    "Team 7",
-                    0
-                ],
-                [
-                    "Team 8",
+                    "Team 1",
                     0
                 ]
             ]
