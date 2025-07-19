@@ -128,20 +128,30 @@ class GameBoard(QWidget):
                 self.category_buttons[q_button] = (cat_id, row)
                 i = row
 
+        self.input_field = QTextEdit()
+        self.input_field.setFont(QFont("Arial", Config.font_size))
+        self.input_field.setStyleSheet("color: 'white'")
+        self.input_field.setAlignment(Qt.AlignCenter)
+        self.input_field.hide()
+
+        self.save_button = QPushButton()
+        self.save_button.setFont(QFont("Arial", Config.font_size))
+        self.save_button.setText('Save')
+        self.save_button.setProperty('class', 'overlayButton')
+        self.save_button.hide()
+
         if self.edit_mode:
-            self.input_field = QTextEdit()
-            self.input_field.setFont(QFont("Arial", Config.font_size))
-            self.input_field.setStyleSheet("color: 'white'")
-            self.input_field.setAlignment(Qt.AlignCenter)
-            self.input_field.hide()
-            self.overlay_layout.addWidget(self.input_field)
+            inputs_layout = QHBoxLayout()
+            self.overlay_layout.addLayout(inputs_layout)
+
+            inputs_layout.addWidget(self.input_field)
 
             self.input_field_answer = QTextEdit()
             self.input_field_answer.setFont(QFont("Arial", Config.font_size))
             self.input_field_answer.setStyleSheet("color: 'white'")
             self.input_field_answer.setAlignment(Qt.AlignCenter)
             self.input_field_answer.hide()
-            self.overlay_layout.addWidget(self.input_field_answer)
+            inputs_layout.addWidget(self.input_field_answer)
 
             self.file_drop = DropLabel(self.window(), self.overlay)
             self.file_drop.setFont(QFont("Arial", Config.font_size))
@@ -150,14 +160,8 @@ class GameBoard(QWidget):
             self.file_drop.setAlignment(Qt.AlignCenter)
             self.file_drop.hide()
             self.overlay_layout.addWidget(self.file_drop)
-
-            self.save_button = QPushButton()
-            self.save_button.setFont(QFont("Arial", Config.font_size))
-            self.save_button.setProperty('class', 'overlayButton')
-            self.save_button.hide()
-            self.save_button.clicked.connect(self.save_edit)
             self.overlay_layout.addWidget(self.save_button)
-
+            self.save_button.clicked.connect(self.save_edit)
             self.overlay_layout.setContentsMargins(0, 0, 0, 0)
         else:
             game_state_reset_button = QPushButton('Reset')
@@ -189,8 +193,17 @@ class GameBoard(QWidget):
 
             self.team_buttons = []
             self.teams_layout = QHBoxLayout()
-            self.team_edit_layout = QVBoxLayout()
-            self.overlay_layout.addLayout(self.team_edit_layout)
+
+            self.overlay_layout.addWidget(self.input_field)
+
+            self.remove_button = QPushButton()
+            self.remove_button.setFont(QFont("Arial", Config.font_size))
+            self.remove_button.setText('Remove')
+            self.remove_button.setProperty('class', 'overlayButton')
+            self.remove_button.hide()
+            self.overlay_layout.addWidget(self.remove_button)
+            self.overlay_layout.addWidget(self.save_button)
+
             #team_grid.setContentsMargins(10, 10, 10, 10)
             #team_grid.setSpacing(10)
             self.populate_team_buttons()
@@ -230,18 +243,15 @@ class GameBoard(QWidget):
 
     def edit_team(self, id, button):
         if self.overlay.isHidden():
-            remove_button = QPushButton()
-            remove_button.setFont(QFont("Arial", Config.font_size))
-            remove_button.setText('Remove')
-            remove_button.setProperty('class', 'overlayButton')
-            remove_button.hide()
-            self.overlay_layout.addWidget(self.remove_button)
             self.overlay.show()
+            self.input_field.setText(self.current_data['saved_games']['save1']['teams'][id][0])
+            self.input_field.show()
             self.input_field.setFocus()
             self.editing_button = button
             self.remove_button.show()
+            self.save_button.show()
             self.remove_button.clicked.connect(lambda _, t_id=id: self.remove_team(t_id))
-            self.input_field.returnPressed.connect(lambda *_, t_id=id, t_button=button: self.finish_edit_team(t_id, t_button))
+            self.save_button.clicked.connect(lambda *_, t_id=id, t_button=button: self.finish_edit_team(t_id, t_button))
     
     def remove_team(self, id):
 
@@ -250,22 +260,22 @@ class GameBoard(QWidget):
             self.save()
         self.remove_button.clicked.disconnect()
         self.remove_button.hide()
-        self.input_field.returnPressed.disconnect()
-        self.input_field.returnPressed.connect(self.save_edit)
+        self.save_button.clicked.disconnect()
+        self.save_button.hide()
         self.overlay.hide()
         self.input_field.setText('')
         self.input_field.hide()
         self.reload_teams()
 
     def finish_edit_team(self, id, button):
-        button.setText(self.input_field.text() + '\n' + str(self.current_data['saved_games']['save1']['teams'][id][1]))
-        self.current_data['saved_games']['save1']['teams'][id][0] = self.input_field.text()
+        button.setText(self.input_field.toPlainText() + '\n' + str(self.current_data['saved_games']['save1']['teams'][id][1]))
+        self.current_data['saved_games']['save1']['teams'][id][0] = self.input_field.toPlainText()
         if (self.auto_save):
             self.save()
         self.remove_button.clicked.disconnect()
         self.remove_button.hide()
-        self.input_field.returnPressed.disconnect()
-        self.input_field.returnPressed.connect(self.save_edit)
+        self.save_button.clicked.disconnect()
+        self.save_button.hide()
         self.overlay.hide()
         self.input_field.setText('')
         self.input_field.hide()
@@ -340,9 +350,9 @@ class GameBoard(QWidget):
         index = self.category_buttons[button]
         button.setStyleSheet("background-color: grey; color: black")
         self.current_data['saved_games']['save1']['board_state'][int(index[0]) - 1][index[1]-1] = True
-        self.play_label.setText(self.current_data['categories'][index[0]][index[1]][1])
+        self.play_label.setText(wrap_text(self.current_data['categories'][index[0]][index[1]][1], 40))
         self.current_question = self.current_data['categories'][index[0]][index[1]]
-        self.answer_label.setText(self.current_data['categories'][index[0]][index[1]][3])
+        self.answer_label.setText(wrap_text(self.current_data['categories'][index[0]][index[1]][3], 40))
         # if question has files
         if len(self.current_question[2]) > 0:
             for file in self.current_question[2]:
@@ -424,7 +434,7 @@ class GameBoard(QWidget):
         self.editing_button = button
 
     def save_edit(self):
-        new_text = self.input_field.text()
+        new_text = self.input_field.toPlainText()
         button = self.editing_button
         index = self.category_buttons[button]
 
@@ -441,8 +451,8 @@ class GameBoard(QWidget):
             # add file paths saving here
             button.setText(str(self.current_data["categories"][index[0]][index[1]][0]) + '\n' + wrap_text(new_text))
             self.current_data['categories'][index[0]][index[1]][1] = new_text
-            if len(self.input_field_answer.text()) > 0 and self.input_field_answer.text() != 'Insert correct answer here':
-                self.current_data['categories'][index[0]][index[1]][3] = self.input_field_answer.text()
+            if len(self.input_field_answer.toPlainText()) > 0 and self.input_field_answer.toPlainText() != 'Insert correct answer here':
+                self.current_data['categories'][index[0]][index[1]][3] = self.input_field_answer.toPlainText()
 
         if self.auto_save:
             self.save()

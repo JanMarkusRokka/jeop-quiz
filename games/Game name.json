@@ -5,7 +5,7 @@
             "Category1",
             [
                 100,
-                "Question1",
+                "See on pikk k\u00fcsimus See on pikk k\u00fcsimus See on pikk k\u00fcsimus See on pikk k\u00fcsimus See on pikk k\u00fcsimus See on pikk k\u00fcsimus See on pikk k\u00fcsimus See on pikk k\u00fcsimus See on pikk k\u00fcsimus See on pikk k\u00fcsimus See on pikk k\u00fcsimus See on pikk k\u00fcsimus ",
                 [
                     "C:/Users/JanMa/Desktop/hakillak/games/chikin.png",
                     "C:/Users/JanMa/Downloads/164481f126259b210491a9c2b7843f56.png"
@@ -222,7 +222,7 @@
         "save1": {
             "board_state": [
                 [
-                    false,
+                    true,
                     false,
                     false,
                     false,
@@ -259,7 +259,31 @@
             ],
             "teams": [
                 [
-                    "Team 1",
+                    "Team 2",
+                    0
+                ],
+                [
+                    "Team 3",
+                    0
+                ],
+                [
+                    "Team 4",
+                    0
+                ],
+                [
+                    "Team 5",
+                    0
+                ],
+                [
+                    "Team 6",
+                    0
+                ],
+                [
+                    "Team 7",
+                    0
+                ],
+                [
+                    "Team 8",
                     0
                 ]
             ]

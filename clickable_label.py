@@ -9,7 +9,6 @@ class ClickableImage(QLabel):
 
     def fitImage(self):
         resized_image = self.original_image.scaled(self.width(), self.height(), Qt.KeepAspectRatio)
-        print('aaaa')
         self.setPixmap(resized_image)
 
     def mousePressEvent(self, event):
