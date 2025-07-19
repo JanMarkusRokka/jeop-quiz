@@ -15,13 +15,13 @@ if __name__ == "__main__":
                     if len(question) == 4:
                         question.append([])
                     if isinstance(question[2], str):
-                        pathlib_path = Path(path)
-                        if pathlib_path.exists():
+                        pathlib_path = Path(question[2])
+                        if pathlib_path.exists() and question[2] != '':
                             question[2] = [question[2]]
                         else:
                             question[2] = []
 
         data_str = json.dumps(data, indent=4)
-        with open('test_patched_file.json', 'w', encoding='utf-8') as f:
+        with open('patched.json', 'w', encoding='utf-8') as f:
             f.write(data_str)
-        input('')
+        input('Success, press enter to close (or close from the window toolbar)')

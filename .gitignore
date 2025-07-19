@@ -16,3 +16,4 @@ dist/
 build/
 games/
 *.pyc
+json_patcher/json_patcher.spec
