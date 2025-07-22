@@ -2,7 +2,7 @@ import json
 from PyQt5.QtWidgets import (
     QWidget, QPushButton, QLabel,
     QVBoxLayout, QHBoxLayout, QGridLayout, QLineEdit,
-    QCheckBox
+    QCheckBox, QSizePolicy
 )
 from PyQt5.QtGui import QFont, QPixmap
 from PyQt5.QtCore import Qt
@@ -12,6 +12,7 @@ from config import Config, wrap_text, clear_layout_recursive, is_int_string
 from video_player_button import VideoPlayerButton
 from clickable_label import ClickableImage
 from custom_text_edit import CustomTextEdit
+import os
 
 class GameBoard(QWidget):
     def __init__(self, return_to_menu_callback, show_image_callback, player):
@@ -24,9 +25,11 @@ class GameBoard(QWidget):
         self.layout = QVBoxLayout(self)
         self.grid_widget = QWidget()
         self.grid = QGridLayout(self.grid_widget)
-        self.grid.setContentsMargins(10, 10, 10, 10)
-        self.grid.setSpacing(10)
+        for i in range(1, 6):
+            self.grid.setRowStretch(i, 1)
+            self.grid.setColumnStretch(i, 1)
 
+        self.grid.setContentsMargins(0, 0, 0, 0)
         self.layout.addWidget(self.grid_widget, 2)
 
         # Overlay
@@ -93,7 +96,7 @@ class GameBoard(QWidget):
         back_btn.clicked.connect(self.return_to_menu_callback)
         self.grid.addWidget(back_btn, 0, 0)
         autosave_checkmark = QCheckBox()
-        autosave_checkmark.setText("auto\nsave")
+        autosave_checkmark.setText("auto")
         autosave_checkmark.setFont(QFont('Arial', Config.font_size))
         autosave_checkmark.setChecked(True)
         autosave_checkmark.clicked.connect(self.switch_autosave)
@@ -109,8 +112,11 @@ class GameBoard(QWidget):
             cat_button.setFont(QFont("Arial", Config.font_size))
             #cat_button.setFixedWidth(120)
             cat_button.setStyleSheet('text-align: center; white-space: normal;')
+            cat_button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
             if (self.edit_mode):
                 cat_button.clicked.connect(lambda _, b=cat_button: self.edit_field(b))
+            else:
+                cat_button.setStyleSheet('text-align: center; white-space: normal; border: none')
 
             self.grid.addWidget(cat_button, 0, col)
 
@@ -120,13 +126,15 @@ class GameBoard(QWidget):
             for row, question in enumerate(questions, start=1):
                 q_button = QPushButton(str(question[0]))
                 q_button.setFont(QFont("Arial", Config.font_size))
+                q_button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
                 if (self.edit_mode):
                     q_button.setText(str(question[0]) + '\n' + wrap_text(question[1]))
                     q_button.clicked.connect(lambda _, b=q_button: self.edit_field(b))
                 else:
+                    q_button.setCheckable(True)
                     q_button.clicked.connect(lambda _, b=q_button: self.play_field(b))
                     if (self.current_data['saved_games']['save1']['board_state'][col-1][row-1]):
-                        q_button.setStyleSheet("background-color: grey; color: black")
+                        q_button.setChecked(True)
                 self.grid.addWidget(q_button, row, col)
                 self.category_buttons[q_button] = (cat_id, row)
                 i = row
@@ -134,7 +142,7 @@ class GameBoard(QWidget):
         self.save_button = QPushButton()
         self.save_button.setFont(QFont("Arial", Config.font_size))
         self.save_button.setText('Save')
-        self.save_button.setProperty('class', 'overlayButton')
+        self.save_button.setStyleSheet('color: white;')
         self.save_button.hide()
 
         if self.edit_mode:
@@ -225,13 +233,14 @@ class GameBoard(QWidget):
             self.points_input.setFont(QFont("Arial", Config.font_size))
             self.points_input.setText("")
             self.points_input.setAlignment(Qt.AlignCenter)
+            self.points_input.setStyleSheet('color: white;')
             self.points_input.hide()
             self.overlay_layout.addWidget(self.points_input)
 
             self.remove_button = QPushButton()
             self.remove_button.setFont(QFont("Arial", Config.font_size))
             self.remove_button.setText('Remove')
-            self.remove_button.setProperty('class', 'overlayButton')
+            self.remove_button.setStyleSheet('color: white;')
             self.remove_button.hide()
             self.overlay_layout.addWidget(self.remove_button)
             self.overlay_layout.addWidget(self.save_button)
@@ -243,6 +252,8 @@ class GameBoard(QWidget):
 
     def add_file_path(self, path, layout):
         button = QPushButton(path)
+        button.setStyleSheet('color: white;')
+        button.setFont(QFont('Arial', Config.font_size - 8))
         button.clicked.connect(button.deleteLater)
         layout.addWidget(button)
 
@@ -388,7 +399,8 @@ class GameBoard(QWidget):
             ]
         self.reload_teams()
         for button in self.category_buttons.keys():
-            button.setStyleSheet("")
+            if self.category_buttons[button][1] > 0:
+                button.setChecked(False)
 
     def save(self):
         data = json.dumps(self.current_data, indent=4)
@@ -418,7 +430,7 @@ class GameBoard(QWidget):
 
     def play_field(self, button):
         index = self.category_buttons[button]
-        button.setStyleSheet("background-color: grey; color: black")
+        button.setChecked(True)
         self.current_data['saved_games']['save1']['board_state'][int(index[0]) - 1][index[1]-1] = True
         self.play_label.setText(wrap_text(self.current_data['categories'][index[0]][index[1]][1], 40))
         self.current_question = self.current_data['categories'][index[0]][index[1]]

@@ -1,16 +1,18 @@
 import os
 from PyQt5.QtWidgets import (
     QWidget, QPushButton, QLabel,
-    QVBoxLayout, QHBoxLayout, QLineEdit,
+    QVBoxLayout, QHBoxLayout, QLineEdit
 )
 from PyQt5.QtGui import QFont
 from PyQt5.QtCore import Qt
 from config import Config, find_games, clear_layout_recursive
+import json
 
 class GameSelector(QWidget):
-    def __init__(self, load_game_callback):
+    def __init__(self, load_game_callback, style_selector_callback):
         super().__init__()
         self.load_game_callback = load_game_callback
+        self.style_selector_callback = style_selector_callback
         self.games_layout = QVBoxLayout()
         self.init_ui()
         # Overlay
@@ -62,6 +64,11 @@ class GameSelector(QWidget):
         self.boxlayout.addStretch()
         self.setLayout(self.boxlayout)
 
+        style_button = QPushButton('Set style')
+        style_button.setFont(QFont('Arial', Config.font_size))
+        style_button.clicked.connect(self.style_selector_callback)
+        self.boxlayout.addWidget(style_button)
+
         layout_font_size = QHBoxLayout()
         font_size_add = QPushButton()
         font_size_add.setText('+ Font size')
@@ -89,7 +96,6 @@ class GameSelector(QWidget):
             button.clicked.connect(lambda _, p=path: self.select_mode(p))
             self.games_layout.addWidget(button)
         self.overlay.raise_()
-
 
     def openNewGameOverlay(self):
         self.new_file_name_input.show()
@@ -120,6 +126,7 @@ class GameSelector(QWidget):
         if self.font_size_example is not None:
             Config.font_size = Config.font_size + amount
             self.font_size_example.setFont(QFont('Arial', Config.font_size))
+            Config.save()
 
     def hide_overlay(self):
         self.select_label.hide()

@@ -1,5 +1,6 @@
 import os
 from PyQt5.QtWidgets import QWidget
+import json
 
 class Config:
     font_size = 14
@@ -8,6 +9,20 @@ class Config:
     'sound_file_extensions': ['.mp3', '.wav'],
     'video_file_extensions': ['.mp4', '.webm', '.wmv', '.avi']
     }
+    style = 'light'
+
+    def save():
+        settings = {'style': Config.style, 'font size': Config.font_size}
+        data = json.dumps(settings, indent=4)
+        with open('settings.json', 'w', encoding='utf-8') as f:
+            f.write(data)
+    
+    def read(path):
+        if os.path.exists(os.path.abspath(path)):
+            with open(path, 'r', encoding='utf-8') as f:
+                settings = json.load(f)
+                Config.style = settings['style']
+                Config.font_size = settings['font size']
 
 def find_games():
     games = {}
