@@ -38,6 +38,11 @@ class StyleSelector(QWidget):
         blue_button.clicked.connect(lambda _,style='light': self.select_style(style))
         self.boxlayout.addWidget(blue_button)
 
+        blue_button = QPushButton('Riiviku')
+        blue_button.setFont(QFont('Arial', Config.font_size))
+        blue_button.clicked.connect(lambda _,style='riiviku': self.select_style(style))
+        self.boxlayout.addWidget(blue_button)
+
         self.boxlayout.addStretch()
     
     def select_style(self, style, edit_settings_file=True):
@@ -89,14 +94,44 @@ class StyleSelector(QWidget):
                         }
                                 
                         QWidget {
-                            background-color: #302F32;
+                            background-color: #2f4858;
                             color: white;
                         }
                         QPushButton:checked {
-                            background-color: #616161;
+                            background-color: #008f9a;
                             color: black;
                         }
-                                    """)
+                    """)
+            case 'riiviku':
+                self.app.setStyleSheet("""
+                        QPushButton {
+                            border-radius: 25px;
+                            border : 2px solid;
+                            border-color: #00d56c;
+                            background-color: #00d56c;
+                            padding: 6px;
+                            
+                        }
+                        QPushButton:hover {
+                            background-color: #63f10a;
+                            border-radius: 25px;
+                            color: #2f4858;              
+                        }
+                                    
+                        QPushButton:pressed {
+                            background-color: #00b392;
+                            border-radius: 20px;              
+                        }
+                                
+                        QWidget {
+                            background-color: #2f4858;
+                            color: white;
+                        }
+                        QPushButton:checked {
+                            background-color: #006b84;
+                            color: black;
+                        }
+                    """)
             case 'light':
                 self.app.setStyleSheet('')
         

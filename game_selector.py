@@ -3,8 +3,8 @@ from PyQt5.QtWidgets import (
     QWidget, QPushButton, QLabel,
     QVBoxLayout, QHBoxLayout, QLineEdit
 )
-from PyQt5.QtGui import QFont
-from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QFont, QMovie
+from PyQt5.QtCore import Qt, QSize
 from config import Config, find_games, clear_layout_recursive
 import json
 
@@ -19,7 +19,7 @@ class GameSelector(QWidget):
         self.overlay = QWidget(self)
         self.overlay.setStyleSheet("background-color: rgba(0, 0, 0, 160);")
         self.overlay.hide()
-        
+
         self.select_label = QLabel(self.overlay)
         self.select_label.setFont(QFont("Arial", Config.font_size))
         self.select_label.setStyleSheet("color: 'white'")
@@ -48,6 +48,19 @@ class GameSelector(QWidget):
 
     def init_ui(self):
         self.boxlayout = QVBoxLayout()
+
+        self.riivillak = QLabel()
+        riivillak_gif = QMovie("riivillak.gif")
+        self.riivillak.setMovie(riivillak_gif)
+        riivillak_gif.start()
+        riivillak_gif.setScaledSize(QSize(593, 100))
+        riivillak_gif.setSpeed(200)
+        self.boxlayout.addWidget(self.riivillak, 0, alignment=Qt.AlignmentFlag.AlignCenter)
+        if (Config.style == 'riiviku'):
+            self.riivillak.show()
+        else:
+            self.riivillak.hide()
+
         label = QLabel("Select a game:")
         label.setFont(QFont("Arial", Config.font_size))
         self.boxlayout.addWidget(label)
@@ -88,6 +101,10 @@ class GameSelector(QWidget):
         self.boxlayout.addLayout(layout_font_size)
 
     def update_games(self):
+        if Config.style == 'riiviku':
+            self.riivillak.show()
+        else:
+            self.riivillak.hide()
         clear_layout_recursive(self.games_layout)
         games = find_games()
         for name, path in games.items():

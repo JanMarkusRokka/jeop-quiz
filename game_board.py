@@ -1,11 +1,14 @@
 import json
+import random
+
+from PyQt5.QtMultimedia import QMediaContent
 from PyQt5.QtWidgets import (
     QWidget, QPushButton, QLabel,
     QVBoxLayout, QHBoxLayout, QGridLayout, QLineEdit,
     QCheckBox, QSizePolicy
 )
 from PyQt5.QtGui import QFont, QPixmap
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QUrl
 from drop_label import DropLabel
 from play_stop_button import PlayStopButton
 from config import Config, wrap_text, clear_layout_recursive, is_int_string
@@ -459,6 +462,13 @@ class GameBoard(QWidget):
             image.fitImage()
 
     def modify_points(self, team_id, button, multiplier=1):
+        if Config.style == 'riiviku':
+            if (multiplier > 0):
+                self.player.setMedia(QMediaContent(QUrl.fromLocalFile('sounds/win' + str(random.randrange(1, 5)) + '.mp3')))
+            elif (multiplier < 0):
+                self.player.setMedia(QMediaContent(QUrl.fromLocalFile('sounds/lose' + str(random.randrange(1, 4)) + '.mp3')))
+            self.player.play()
+
         points = self.current_question[0]
         self.current_data['saved_games']['save1']['teams'][team_id][1] += points * multiplier
         team = self.current_data['saved_games']['save1']['teams'][team_id]
