@@ -443,6 +443,7 @@ class GameBoard(QWidget):
             for file in self.current_question[2]:
                 path = file
                 self.add_file_display(path, self.file_showcase)
+        if len(self.current_question[4]) > 0:
             for file in self.current_question[4]:
                 path = file
                 display = self.add_file_display(path, self.file_showcase_answer)
